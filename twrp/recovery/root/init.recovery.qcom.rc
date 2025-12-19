@@ -53,7 +53,7 @@ on property:twrp.modules.loaded=true
     # Load ADSP firmware for PMIC
     wait /sys/kernel/boot_adsp/boot
     write /sys/kernel/boot_adsp/boot 1
-    wait /sys/class/power_supply/battery
+    # Commented: wait /sys/class/power_supply/battery - causes 5s delay, not critical for recovery
     start health-hal-2-1
     start vendor.qti.vibrator
     umount /firmware
