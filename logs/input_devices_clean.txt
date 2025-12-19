@@ -1,0 +1,218 @@
+﻿add device 1: /dev/input/event18
+  name:     "fts_ts"
+  events:
+    KEY (0001): KEY_W                 KEY_E                 KEY_U                 KEY_O                
+                KEY_S                 KEY_L                 KEY_Z                 KEY_C                
+                KEY_V                 KEY_M                 KEY_UP                KEY_LEFT             
+                KEY_RIGHT             KEY_DOWN              KEY_POWER             KEY_WAKEUP           
+                00f9                  00fc                  BTN_TOUCH            
+    ABS (0003): ABS_MT_SLOT           : value 0, min 0, max 9, fuzz 0, flat 0, resolution 0
+                ABS_MT_TOUCH_MAJOR    : value 0, min 0, max 255, fuzz 0, flat 0, resolution 0
+                ABS_MT_POSITION_X     : value 0, min 0, max 1260, fuzz 0, flat 0, resolution 0
+                ABS_MT_POSITION_Y     : value 0, min 0, max 2800, fuzz 0, flat 0, resolution 0
+                ABS_MT_TRACKING_ID    : value 0, min 0, max 65535, fuzz 0, flat 0, resolution 0
+  input props:
+    INPUT_PROP_DIRECT
+add device 2: /dev/input/event4
+  name:     "qwerty"
+  events:
+    KEY (0001): KEY_HOME              KEY_UP                KEY_LEFT              KEY_RIGHT            
+                KEY_DOWN              KEY_VOLUMEDOWN        KEY_VOLUMEUP          KEY_POWER            
+                KEY_MENU              KEY_BACK              KEY_CAMERA            KEY_CHAT             
+                KEY_SEARCH           
+  input props:
+    <none>
+add device 3: /dev/input/event16
+  name:     "aw9380x_0_ch11"
+  events:
+    KEY (0001): 00fb                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Z                 : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RX                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RY                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RZ                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_DISTANCE          : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+add device 4: /dev/input/event8
+  name:     "aw9380x_0_ch3"
+  events:
+    KEY (0001): 00fb                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Z                 : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RX                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RY                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RZ                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_DISTANCE          : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+add device 5: /dev/input/event5
+  name:     "aw9380x_0_ch0"
+  events:
+    KEY (0001): 00fb                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Z                 : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RX                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RY                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RZ                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_DISTANCE          : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+add device 6: /dev/input/event9
+  name:     "aw9380x_0_ch4"
+  events:
+    KEY (0001): 00fb                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Z                 : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RX                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RY                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RZ                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_DISTANCE          : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+add device 7: /dev/input/event11
+  name:     "aw9380x_0_ch6"
+  events:
+    KEY (0001): 00fb                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Z                 : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RX                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RY                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RZ                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_DISTANCE          : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+add device 8: /dev/input/event15
+  name:     "aw9380x_0_ch10"
+  events:
+    KEY (0001): 00fb                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Z                 : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RX                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RY                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RZ                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_DISTANCE          : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+add device 9: /dev/input/event12
+  name:     "aw9380x_0_ch7"
+  events:
+    KEY (0001): 00fb                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Z                 : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RX                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RY                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RZ                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_DISTANCE          : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+add device 10: /dev/input/event6
+  name:     "aw9380x_0_ch1"
+  events:
+    KEY (0001): 00fb                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Z                 : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RX                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RY                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RZ                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_DISTANCE          : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+add device 11: /dev/input/event17
+  name:     "aw9380x_0_wear"
+  events:
+    KEY (0001): 00fb                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Z                 : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RX                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RY                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RZ                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_DISTANCE          : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+add device 12: /dev/input/event7
+  name:     "aw9380x_0_ch2"
+  events:
+    KEY (0001): 00fb                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Z                 : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RX                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RY                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RZ                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_DISTANCE          : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+add device 13: /dev/input/event13
+  name:     "aw9380x_0_ch8"
+  events:
+    KEY (0001): 00fb                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Z                 : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RX                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RY                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RZ                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_DISTANCE          : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+add device 14: /dev/input/event10
+  name:     "aw9380x_0_ch5"
+  events:
+    KEY (0001): 00fb                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Z                 : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RX                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RY                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RZ                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_DISTANCE          : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+add device 15: /dev/input/event14
+  name:     "aw9380x_0_ch9"
+  events:
+    KEY (0001): 00fb                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 11, fuzz 0, flat 0, resolution 0
+                ABS_Z                 : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RX                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RY                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_RZ                : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_DISTANCE          : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+add device 16: /dev/input/event2
+  name:     "gpio-keys"
+  events:
+    KEY (0001): KEY_VOLUMEUP          00fa                 
+  input props:
+    <none>
+add device 17: /dev/input/event0
+  name:     "pmic_pwrkey"
+  events:
+    KEY (0001): KEY_POWER            
+  input props:
+    <none>
+add device 18: /dev/input/event3
+  name:     "qcom-hv-haptics"
+  events:
+    FF  (0015): FF_RUMBLE             FF_PERIODIC           FF_CONSTANT           FF_CUSTOM            
+                FF_GAIN              
+  input props:
+    <none>
+add device 19: /dev/input/event1
+  name:     "pmic_resin"
+  events:
+    KEY (0001): KEY_VOLUMEDOWN       
+  input props:
+    <none>
