@@ -13,14 +13,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Tries to mount system_other as a logical partition. If that fails, then
-# mount as a physical partition.
-
 #<src>                    <mnt_point>  <type> <mnt_flags and options> <fs_mgr_flags>
-system                    /postinstall ext4   ro,nosuid,nodev,noexec  slotselect_other,logical
-system                    /postinstall erofs  ro,nosuid,nodev,noexec  slotselect_other,logical
-/dev/block/by-name/system /postinstall ext4   ro,nosuid,nodev,noexec  slotselect_other
-/dev/block/by-name/system /postinstall erofs  ro,nosuid,nodev,noexec  slotselect_other
-/dev/block/mapper/system /postinstall ext4   ro,nosuid,nodev,noexec  slotselect_other
-/dev/block/mapper/system /postinstall erofs  ro,nosuid,nodev,noexec  slotselect_other
-
+system                    /postinstall ext4   ro,nosuid,nodev,noexec  slotselect_other,logical,avb_keys=/product/etc/security/avb/system_other.avbpubkey

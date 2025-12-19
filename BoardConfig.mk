@@ -1,93 +1,41 @@
 #
-# Copyright (C) 2025 The Android Open Source Project
-# Copyright (C) 2025 SebaUbuntu's TWRP device tree generator
+# Copyright 2017 The Android Open Source Project
 #
-# SPDX-License-Identifier: Apache-2.0
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
-DEVICE_PATH := device/nothing/Metroid
+# This contains the module build definitions for the hardware-specific
+# components for this device.
+#
+# As much as possible, those components should be built unconditionally,
+# with device-specific names to avoid collisions, to avoid device-specific
+# bitrot and build breakages. Building a component unconditionally does
+# *not* include it on all devices, so it is safe even with hardware-specific
+# components.
 
-# For building with minimal manifest
-ALLOW_MISSING_DEPENDENCIES := true
-
-# A/B
-AB_OTA_UPDATER := true
-AB_OTA_PARTITIONS += \
-    odm \
-    system \
-    product \
-    system_ext \
-    vendor
-BOARD_USES_RECOVERY_AS_BOOT := true
-
-# Architecture
-TARGET_ARCH := arm64
-TARGET_ARCH_VARIANT := armv8-a
-TARGET_CPU_ABI := arm64-v8a
-TARGET_CPU_ABI2 := 
-TARGET_CPU_VARIANT := generic
-TARGET_CPU_VARIANT_RUNTIME := kryo300
-
-# APEX
-DEXPREOPT_GENERATE_APEX_IMAGE := true
-
-# Bootloader
-TARGET_BOOTLOADER_BOARD_NAME := sun
-TARGET_NO_BOOTLOADER := true
-
-# Display
-TARGET_USES_VULKAN := true
-
-# Kernel
-BOARD_BOOTIMG_HEADER_VERSION := 4
-BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOTIMG_HEADER_VERSION)
-BOARD_KERNEL_IMAGE_NAME := Image
-TARGET_KERNEL_CONFIG := Metroid_defconfig
-TARGET_KERNEL_SOURCE := kernel/nothing/Metroid
-
-# Kernel - prebuilt
-TARGET_FORCE_PREBUILT_KERNEL := true
-ifeq ($(TARGET_FORCE_PREBUILT_KERNEL),true)
-TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
-endif
-
-# Partitions
-BOARD_BOOTIMAGE_PARTITION_SIZE := 104857600
-BOARD_RECOVERYIMAGE_PARTITION_SIZE := 104857600
-BOARD_HAS_LARGE_FILESYSTEM := true
-BOARD_SYSTEMIMAGE_PARTITION_TYPE := ext4
-BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := ext4
-BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
-TARGET_COPY_OUT_VENDOR := vendor
-BOARD_SUPER_PARTITION_SIZE := 9126805504 # TODO: Fix hardcoded value
-BOARD_SUPER_PARTITION_GROUPS := nothing_dynamic_partitions
-BOARD_NOTHING_DYNAMIC_PARTITIONS_PARTITION_LIST := system system_ext product vendor odm
-BOARD_NOTHING_DYNAMIC_PARTITIONS_SIZE := 9122611200 # TODO: Fix hardcoded value
-
-# Platform
-TARGET_BOARD_PLATFORM := sun
+# Inherit from common
+-include $(DEVICE_PATH)/BoardConfigCommon.mk
 
 # Recovery
-TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
-TARGET_USERIMAGES_USE_EXT4 := true
-TARGET_USERIMAGES_USE_F2FS := true
+#TARGET_OTA_ASSERT_DEVICE := Metroid
 
-# Security patch level
-VENDOR_SECURITY_PATCH := 2021-08-01
+# TWRP specific build flags
+TW_FRAMERATE := 120
 
-# Verified Boot
-BOARD_AVB_ENABLE := true
-BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
+# Vibrator
+TW_SUPPORT_INPUT_AIDL_HAPTICS := true
+#TW_SUPPORT_INPUT_AIDL_HAPTICS_FIX_OFF := true
 
-# Hack: prevent anti rollback
-PLATFORM_SECURITY_PATCH := 2099-12-31
-VENDOR_SECURITY_PATCH := 2099-12-31
-PLATFORM_VERSION := 16.1.0
-
-# TWRP Configuration
-TW_THEME := portrait_hdpi
-TW_EXTRA_LANGUAGES := true
-TW_SCREEN_BLANK_ON_BOOT := true
-TW_INPUT_BLACKLIST := "hbtp_vm"
-TW_USE_TOOLBOX := true
-TW_INCLUDE_REPACKTOOLS := true
+TARGET_RECOVERY_DEVICE_MODULES += libexpat
+RECOVERY_LIBRARY_SOURCE_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libexpat.so
+TW_FORCE_KEYMASTER_VER := true
