@@ -35,6 +35,9 @@ on fs
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
     write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
 
+on post-fs
+    mount none /system/etc/dummy_vibrator.xml /vendor/etc/vintf/manifest/vendor.qti.hardware.vibrator.service.xml bind
+
 on boot
     setprop sys.usb.config adb
 
