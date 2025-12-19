@@ -72,7 +72,8 @@ BOARD_USERDATAIMAGE_PARTITION_SIZE := 241547554816	#TODO
 BOARD_PERSISTIMAGE_PARTITION_SIZE := 33554432		#TODO
 BOARD_PERSISTIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_METADATAIMAGE_PARTITION_SIZE := 16777216		#TODO
-BOARD_DTBOIMG_PARTITION_SIZE := 24117248		#TODO
+BOARD_DTBOIMG_PARTITION_SIZE := 50331648
+BOARD_INIT_BOOT_IMAGE_PARTITION_SIZE := 8388608
 BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_FLASH_BLOCK_SIZE := 262144 # (BOARD_KERNEL_PAGESIZE * 64) #TODO
 
@@ -168,7 +169,7 @@ RECOVERY_LIBRARY_SOURCE_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/libdebuggerd_client.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@1.0.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@2.0.so
-TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_esoc.ko qcom_sysmon.ko goodix_core.ko fts_tp.ko leds-qpnp-vibrator-ldo.ko haptic.ko qti_battery_charger.ko hwmon.ko"
+TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_sysmon.ko leds-qpnp-vibrator-ldo.ko haptic.ko qti_battery_charger.ko hwmon.ko touchpanel_event_notify.ko st_fts.ko atmel_mxt_ts.ko focaltech_tp.ko qts.ko goodix_ts.ko goodix_fp.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 TW_MAX_BRIGHTNESS := 4095
 # TWRP Debug Flags

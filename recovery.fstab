@@ -28,6 +28,7 @@ odm                                                       /odm                  
 /dev/block/bootdevice/by-name/bluetooth                   /vendor/bt_firmware      vfat      ro,shortname=lower,uid=1002,gid=3002,dmask=227,fmask=337,context=u:object_r:bt_firmware_file:s0          wait,slotselect
 /dev/block/bootdevice/by-name/qmcs                        /mnt/vendor/qmcs         vfat      noatime,nosuid,nodev,context=u:object_r:vendor_qmcs_file:s0             wait,check,formattable
 /dev/block/bootdevice/by-name/spunvm                      /mnt/vendor/spunvm       vfat      noatime,nosuid,nodev,context=u:object_r:vendor_spunvm_file:s0             wait,check,formattable
+/dev/block/bootdevice/by-name/vm-persist                  /mnt/product/vm-persist  ext4      noatime,nosuid,nodev,barrier=1                                            wait
 /dev/block/by-name/nt_log                                 /mnt/product/nt_log      ext4      noatime,nosuid,nodev,discard,barrier=1            wait,check,formattable,first_stage_mount,nofail
 /dev/block/by-name/nt_log                                 /mnt/vendor/nt_log       ext4      noatime,nosuid,nodev,discard,barrier=1            wait,check,formattable,first_stage_mount,nofail
 
