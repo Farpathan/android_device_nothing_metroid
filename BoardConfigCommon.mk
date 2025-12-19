@@ -169,7 +169,7 @@ RECOVERY_LIBRARY_SOURCE_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/libdebuggerd_client.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@1.0.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@2.0.so
-TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_sysmon.ko leds-qpnp-vibrator-ldo.ko haptic.ko qti_battery_charger.ko hwmon.ko atmel_mxt_ts.ko focaltech_tp.ko goodix_ts.ko goodix_fp.ko"
+TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_sysmon.ko leds-qpnp-vibrator-ldo.ko haptic.ko panel_event_notifier.ko qti_battery_charger.ko hwmon.ko atmel_mxt_ts.ko focaltech_tp.ko goodix_ts.ko goodix_fp.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 TW_MAX_BRIGHTNESS := 4095
 # TWRP Debug Flags
