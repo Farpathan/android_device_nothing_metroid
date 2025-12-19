@@ -36,9 +36,9 @@ on fs
     write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
 
 on post-fs
-    mount none /system/etc/dummy_manifest.xml /vendor/etc/vintf/manifest/vendor.qti.hardware.vibrator.service.xml bind
-    mount none /system/etc/dummy_manifest.xml /vendor/etc/vintf/manifest/android.hardware.security.keymint-service-qti.xml bind
-    mount none /system/etc/dummy_manifest.xml /vendor/etc/vintf/manifest/android.hardware.health-service.qti.xml bind
+    mount none /system/etc/dummy_vibrator.xml /vendor/etc/vintf/manifest/vendor.qti.hardware.vibrator.service.xml bind
+    mount none /system/etc/dummy_keymint.xml /vendor/etc/vintf/manifest/android.hardware.security.keymint-service-qti.xml bind
+    mount none /system/etc/dummy_health.xml /vendor/etc/vintf/manifest/android.hardware.health-service.qti.xml bind
 
 on boot
     setprop sys.usb.config adb
