@@ -172,6 +172,15 @@ RECOVERY_LIBRARY_SOURCE_FILES += \
 TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_sysmon.ko qcom_glink.ko qcom_glink_smem.ko qti_pmic_glink.ko leds-qpnp-vibrator-ldo.ko haptic.ko panel_event_notifier.ko qti_battery_charger.ko hwmon.ko atmel_mxt_ts.ko focaltech_tp.ko goodix_ts.ko goodix_fp.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 TW_MAX_BRIGHTNESS := 4095
+
+# Touch Input Device Configuration - CRITICAL for touch support
+TW_NO_INPUT_DEVICES := false
+TW_INPUT_BLACKLIST := ""
+BOARD_HAS_NO_SELECT_BUTTON := true
+RECOVERY_TOUCHSCREEN_SWAP_XY := false
+RECOVERY_TOUCHSCREEN_FLIP_X := false
+RECOVERY_TOUCHSCREEN_FLIP_Y := false
+
 # TWRP Debug Flags
 #TWRP_EVENT_LOGGING := true
 TARGET_USES_LOGD := true
