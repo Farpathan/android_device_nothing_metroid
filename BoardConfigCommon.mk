@@ -173,7 +173,7 @@ TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko q
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 TW_MAX_BRIGHTNESS := 4095
 
-# Touch Input Device Configuration - CRITICAL for touch support
+# Touch Input Configuration - Force detection of input devices
 TW_NO_INPUT_DEVICES := false
 TW_INPUT_BLACKLIST := ""
 BOARD_HAS_NO_SELECT_BUTTON := true
