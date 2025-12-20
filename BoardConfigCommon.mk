@@ -175,7 +175,7 @@ TW_MAX_BRIGHTNESS := 4095
 
 # Touch Input Configuration - Force detection of input devices
 TW_NO_INPUT_DEVICES := false
-TW_INPUT_BLACKLIST := ""
+TW_INPUT_BLACKLIST := "null"
 BOARD_HAS_NO_SELECT_BUTTON := true
 RECOVERY_TOUCHSCREEN_SWAP_XY := false
 RECOVERY_TOUCHSCREEN_FLIP_X := false
