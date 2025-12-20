@@ -33,7 +33,7 @@
 TW_FRAMERATE := 120
 
 # Vibrator
-TW_SUPPORT_INPUT_AIDL_HAPTICS := true
+#TW_SUPPORT_INPUT_AIDL_HAPTICS := true
 #TW_SUPPORT_INPUT_AIDL_HAPTICS_FIX_OFF := true
 
 # Touch Input - Force TWRP to detect fts_ts touchscreen
