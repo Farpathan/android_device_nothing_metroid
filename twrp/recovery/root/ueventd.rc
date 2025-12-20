@@ -1,0 +1,1 @@
+firmware_directories /ramdisk_fw /vendor/firmware /vendor/firmware_mnt /system/etc/firmware
