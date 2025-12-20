@@ -56,4 +56,4 @@ on property:twrp.modules.loaded=true
     # Commented: wait /sys/class/power_supply/battery - causes 5s delay, not critical for recovery
     start health-hal-2-1
     start vendor.qti.vibrator
-    umount /firmware
+    #umount /firmware
