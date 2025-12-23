@@ -1,12 +1,20 @@
 # Copyright (c) 2023 The Android Open Source Project
 # FBE Decryption services for Nothing Phone (3)
 
+# qseecomd - QSEE communication daemon
+service qseecomd /vendor/bin/qseecomd
+    user root
+    group root drmrpc system
+    disabled
+    setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64:/vendor/lib:/system/lib:/sbin
+    seclabel u:r:recovery:s0
+
 # KeyMint service - provides encryption key management
 service vendor.keymint-qti /vendor/bin/hw/android.hardware.security.keymint-service-qti
     user root
     group root drmrpc system
     disabled
-    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
+    setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64:/vendor/lib:/system/lib:/sbin
     seclabel u:r:recovery:s0
 
 # Gatekeeper service - provides credential verification
@@ -14,20 +22,23 @@ service vendor.gatekeeper-qti /vendor/bin/hw/android.hardware.gatekeeper-service
     user root
     group root
     disabled
-    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
+    setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64:/vendor/lib:/system/lib:/sbin
     seclabel u:r:recovery:s0
 
 on property:crypto.ready=1
     # Start crypto services when crypto is ready
+    start qseecomd
     start vendor.keymint-qti
     start vendor.gatekeeper-qti
 
 on property:twrp.decrypt.done=true
     # Crypto services started after successful decryption trigger
+    start qseecomd
     start vendor.keymint-qti
     start vendor.gatekeeper-qti
 
 on property:hwservicemanager.ready=true
     # Ensure crypto services start when hwservicemanager is ready
+    start qseecomd
     start vendor.keymint-qti
     start vendor.gatekeeper-qti

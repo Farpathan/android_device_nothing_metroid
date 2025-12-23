@@ -1,0 +1,287 @@
+Starting OrangeFox Recovery R11.3 [default, core: R11.3] (built on Tue Dec 23 20:14:07 2025 for Metroid [dev_ver: 2025-12-20 (902d7008)]; pid 440)
+TW_NO_USB_STORAGE := true
+PRODUCT_USE_DYNAMIC_PARTITIONS := true
+TW_INCLUDE_CRYPTO := true
+I:Found brightness file at '/sys/devices/platform/soc/ae00000.qcom,mdss_mdp/backlight/panel0-backlight/brightness'
+I:TWFunc::Set_Brightness: Setting brightness control to 420
+I:TW_EXCLUDE_ENCRYPTED_BACKUPS := true
+I:LANG: en
+I:AB_OTA_UPDATER := true
+boot command: boot-recovery
+I:Startup Commands: 
+=> Linking mtab
+=> Processing /etc/recovery.fstab
+I:Reading /etc/twrp.flags
+I:Reading /etc/recovery.fstab
+I:Processing '/system'
+I:Created '/system_root' folder.
+I:Unhandled flag: 'avb=vbmeta_system'
+I:Unhandled flag: 'first_stage_mount'
+I:Unhandled flag: 'avb_keys=/'
+I:Trying to prepare system from super partition
+I:Symlinking /dev/block/dm-4 => /dev/block/bootdevice/by-name/system 
+I:Symlinking /dev/block/dm-4 => /dev/block/by-name/system 
+I:Found an additional entry for '/system'
+I:Processing '/system'
+I:Processing '/system_ext'
+I:Created '/system_ext' folder.
+I:Unhandled flag: 'avb=vbmeta_system'
+I:Unhandled flag: 'first_stage_mount'
+I:Trying to prepare system_ext from super partition
+I:Symlinking /dev/block/dm-8 => /dev/block/bootdevice/by-name/system_ext 
+I:Symlinking /dev/block/dm-8 => /dev/block/by-name/system_ext 
+I:Found an additional entry for '/system_ext'
+I:Processing '/system_ext'
+I:Processing '/product'
+I:Created '/product' folder.
+I:Unhandled flag: 'avb=vbmeta_system'
+I:Unhandled flag: 'first_stage_mount'
+I:Trying to prepare product from super partition
+I:Symlinking /dev/block/dm-2 => /dev/block/bootdevice/by-name/product 
+I:Symlinking /dev/block/dm-2 => /dev/block/by-name/product 
+I:Found an additional entry for '/product'
+I:Processing '/product'
+I:Processing '/vendor'
+I:Unhandled flag: 'avb=vbmeta'
+I:Unhandled flag: 'first_stage_mount'
+I:Trying to prepare vendor from super partition
+I:Symlinking /dev/block/dm-10 => /dev/block/bootdevice/by-name/vendor 
+I:Symlinking /dev/block/dm-10 => /dev/block/by-name/vendor 
+I:Found an additional entry for '/vendor'
+I:Processing '/vendor'
+I:Processing '/vendor_dlkm'
+I:Unhandled flag: 'avb=vbmeta'
+I:Unhandled flag: 'first_stage_mount'
+I:Trying to prepare vendor_dlkm from super partition
+I:Symlinking /dev/block/dm-12 => /dev/block/bootdevice/by-name/vendor_dlkm 
+I:Symlinking /dev/block/dm-12 => /dev/block/by-name/vendor_dlkm 
+I:Found an additional entry for '/vendor_dlkm'
+I:Processing '/vendor_dlkm'
+I:Processing '/system_dlkm'
+I:Created '/system_dlkm' folder.
+I:Unhandled flag: 'avb=vbmeta'
+I:Unhandled flag: 'first_stage_mount'
+I:Trying to prepare system_dlkm from super partition
+I:Symlinking /dev/block/dm-6 => /dev/block/bootdevice/by-name/system_dlkm 
+I:Symlinking /dev/block/dm-6 => /dev/block/by-name/system_dlkm 
+I:Found an additional entry for '/system_dlkm'
+I:Processing '/system_dlkm'
+I:Processing '/odm'
+I:Unhandled flag: 'avb=vbmeta'
+I:Unhandled flag: 'first_stage_mount'
+I:Trying to prepare odm from super partition
+I:Symlinking /dev/block/dm-0 => /dev/block/bootdevice/by-name/odm 
+I:Symlinking /dev/block/dm-0 => /dev/block/by-name/odm 
+I:Found an additional entry for '/odm'
+I:Processing '/odm'
+I:Processing '/boot'
+I:Unhandled flag: 'avb=vbmeta'
+I:Unhandled flag: 'first_stage_mount'
+I:Processing '/init_boot'
+I:Unhandled flag: 'avb=vbmeta'
+I:Unhandled flag: 'first_stage_mount'
+I:Processing '/vendor_boot'
+I:Unhandled flag: 'avb=vbmeta'
+I:Unhandled flag: 'first_stage_mount'
+I:Processing '/dtbo'
+I:Unhandled flag: 'avb=vbmeta'
+I:Unhandled flag: 'first_stage_mount'
+I:Processing '/recovery'
+I:Unhandled flag: 'avb=vbmeta'
+I:Unhandled flag: 'first_stage_mount'
+I:Processing '/metadata'
+I:Unhandled flag: 'first_stage_mount'
+I:Unhandled flag: 'sync'
+I:Processing '/mnt/vendor/persist'
+I:Created '/mnt/vendor/persist' folder.
+I:Processing '/data'
+I:Unhandled flag: 'latemount'
+I:Unhandled flag: 'reservedsize=128M'
+I:Processing '/misc'
+I:Processing '/storage/sdcard1'
+I:Created '/storage/sdcard1' folder.
+I:Processing '/storage/usbotg'
+I:Created '/storage/usbotg' folder.
+I:Found an additional entry for '/vendor/firmware_mnt'
+I:Processing '/vendor/firmware_mnt'
+I:Found an additional entry for '/vendor/dsp'
+I:Processing '/vendor/dsp'
+I:Found an additional entry for '/vendor/bt_firmware'
+I:Processing '/vendor/bt_firmware'
+I:Processing '/mnt/vendor/qmcs'
+I:Created '/mnt/vendor/qmcs' folder.
+I:Processing '/mnt/vendor/spunvm'
+I:Created '/mnt/vendor/spunvm' folder.
+I:Processing '/mnt/product/vm-persist'
+I:Created '/mnt/product/vm-persist' folder.
+I:Processing '/mnt/product/nt_log'
+I:Created '/mnt/product/nt_log' folder.
+I:Unhandled flag: 'first_stage_mount'
+I:Unhandled flag: 'nofail'
+I:Processing '/mnt/vendor/nt_log'
+I:Created '/mnt/vendor/nt_log' folder.
+I:Unhandled flag: 'first_stage_mount'
+I:Unhandled flag: 'nofail'
+I:Processing remaining twrp.flags
+I:Processing '/bluetooth'
+I:Processing '/dsp'
+I:Processing '/efs1'
+I:Processing '/efs2'
+I:Processing '/efsc'
+I:Processing '/efsg'
+I:Processing '/firmware'
+I:Created '/firmware' folder.
+I:Processing '/modem'
+I:Processing '/persist'
+I:Created '/persist' folder.
+I:TWFunc::Fixup_Time: Pre-fix date and time: 1970-03-27--05-41-49
+I:TWFunc::Fixup_Time: Setting time offset from file /sys/class/rtc/rtc0/since_epoch
+I:TWFunc::Fixup_Time: will attempt to use the ats files now.
+I:TWFunc::Fixup_Time: Setting time offset from file /persist/time/ats_2, offset 1759156728141
+I:TWFunc::Fixup_Time: Date and time corrected: 2025-12-23--20-20-37
+I:Processing '/persist_image'
+I:Processing '/storage'
+I:Processing '/usb_otg'
+I:Created '/usb_otg' folder.
+I:Processing '/vbmeta'
+I:Processing '/vbmeta_system'
+I:Attempting to load modules
+I:Checking mounted /vendor
+I:Checking mounted /vendor_dlkm
+I:Checking directory: /vendor/lib/modules
+I:number of modules loaded by init: 340
+I:found module to dedupe: tz_log_dlkm.ko
+I:found module to dedupe: q6_notifier_dlkm.ko
+I:found module to dedupe: q6_pdr_dlkm.ko
+I:found module to dedupe: q6_dlkm.ko
+I:found module to dedupe: hdcp_qseecom_dlkm.ko
+I:found module to dedupe: qcom_q6v5_pas.ko
+I:found module to dedupe: qti_battery_charger.ko
+I:found module to dedupe: qti_pmic_glink.ko
+I:found module to dedupe: qcom_q6v5.ko
+I:found module to dedupe: qcom_sysmon.ko
+I:found module to dedupe: glink_probe.ko
+I:found module to dedupe: rproc_qcom_common.ko
+I:found module to dedupe: qcom_glink_smem.ko
+I:found module to dedupe: qcom_glink_spss.ko
+I:found module to dedupe: glink_pkt.ko
+I:found module to dedupe: qcom_glink.ko
+I:found module to dedupe: goodix_fp.ko
+I:found module to dedupe: haptic.ko
+I:found module to dedupe: panel_event_notifier.ko
+I:found module to dedupe: hwmon.ko
+I:found module to dedupe: qseecom_proxy.ko
+I:mounting /tmp/vendor/lib/modules on /vendor/lib/modules
+I:Modules Loaded: 8
+I:Checking directory: /vendor/lib/modules/1.1
+I:Unable to open module directory: /vendor/lib/modules/1.1. Skipping
+I:number of modules loaded by init: 348
+I:found module to dedupe: adsp_loader_dlkm.ko
+I:found module to dedupe: atmel_mxt_ts.ko
+I:found module to dedupe: focaltech_tp.ko
+I:found module to dedupe: goodix_ts.ko
+I:found module to dedupe: tz_log_dlkm.ko
+I:found module to dedupe: q6_notifier_dlkm.ko
+I:found module to dedupe: q6_pdr_dlkm.ko
+I:found module to dedupe: q6_dlkm.ko
+I:found module to dedupe: hdcp_qseecom_dlkm.ko
+I:found module to dedupe: qcom_q6v5_pas.ko
+I:found module to dedupe: qti_battery_charger.ko
+I:found module to dedupe: qti_pmic_glink.ko
+I:found module to dedupe: qcom_q6v5.ko
+I:found module to dedupe: qcom_sysmon.ko
+I:found module to dedupe: glink_probe.ko
+I:found module to dedupe: rproc_qcom_common.ko
+I:found module to dedupe: qcom_glink_smem.ko
+I:found module to dedupe: qcom_glink_spss.ko
+I:found module to dedupe: glink_pkt.ko
+I:found module to dedupe: qcom_glink.ko
+I:found module to dedupe: goodix_fp.ko
+I:found module to dedupe: haptic.ko
+I:found module to dedupe: panel_event_notifier.ko
+I:found module to dedupe: hwmon.ko
+I:found module to dedupe: qseecom_proxy.ko
+I:mounting /tmp/vendor/lib/modules/1.1 on /vendor/lib/modules/1.1
+I:Checking directory: /vendor_dlkm/lib/modules
+I:number of modules loaded by init: 348
+I:found module to dedupe: adsp_loader_dlkm.ko
+I:found module to dedupe: atmel_mxt_ts.ko
+I:found module to dedupe: focaltech_tp.ko
+I:found module to dedupe: goodix_ts.ko
+I:found module to dedupe: tz_log_dlkm.ko
+I:found module to dedupe: q6_notifier_dlkm.ko
+I:found module to dedupe: q6_pdr_dlkm.ko
+I:found module to dedupe: q6_dlkm.ko
+I:found module to dedupe: hdcp_qseecom_dlkm.ko
+I:found module to dedupe: qcom_q6v5_pas.ko
+I:found module to dedupe: qti_battery_charger.ko
+I:found module to dedupe: qti_pmic_glink.ko
+I:found module to dedupe: qcom_q6v5.ko
+I:found module to dedupe: qcom_sysmon.ko
+I:found module to dedupe: glink_probe.ko
+I:found module to dedupe: rproc_qcom_common.ko
+I:found module to dedupe: qcom_glink_smem.ko
+I:found module to dedupe: qcom_glink_spss.ko
+I:found module to dedupe: glink_pkt.ko
+I:found module to dedupe: qcom_glink.ko
+I:found module to dedupe: goodix_fp.ko
+I:found module to dedupe: haptic.ko
+I:found module to dedupe: panel_event_notifier.ko
+I:found module to dedupe: hwmon.ko
+I:found module to dedupe: qseecom_proxy.ko
+I:mounting /tmp/vendor_dlkm/lib/modules on /vendor_dlkm/lib/modules
+I:Modules Loaded: 0
+I:Deleting property 'ro.crypto.dm_default_key.options_format.version'
+I:Deleting property 'ro.crypto.volume.metadata.method'
+I:Setting 'external_storage.casefold.enabled' to '1' from /vendor/build.prop
+I:Setting 'external_storage.sdcardfs.enabled' to '0' from /vendor/build.prop
+I:GetFstabPath: /odm/etc/fstab.default
+I:GetFstabPath: /vendor/etc/fstab.default
+I:Fstab: /vendor/etc/fstab.default
+I:Reading /etc/additional.fstab
+I:Processing '/metadata'
+I:Unhandled flag: 'first_stage_mount'
+I:Unhandled flag: 'sync'
+I:Processing '/data'
+I:Unhandled flag: 'latemount'
+I:FBE contents 'aes-256-xts', filenames 'aes-256-cts:v2+inlinecrypt_optimized+wrappedkey_v0'
+I:setting Key_Directory to: /metadata/vold/metadata_encryption
+I:Metadata contents 'aes-256-xts', filenames 'wrappedkey_v0'
+I:Unhandled flag: 'reservedsize=128M'
+I:Unhandled flag: 'sysfs_path=/sys/devices/platform/soc/1d84000.ufshc'
+I:Ignoring the 'fscompress' fstab flag
+I:Unhandled flag: 'checkpoint=fs'
+I:Done processing fstab files
+I:Keymaster_Ver::Force Keymaster_Ver flag found.
+I:Keymaster_Ver::Using keymaster version '4.1' for decryption
+Starting the UI...
+Skipping adf graphics -- not present in build tree
+width: 1260, height: 2800
+setting DRM_FORMAT_XBGR8888 and GGL_PIXEL_FORMAT_RGBA_8888
+setting DRM_FORMAT_XBGR8888 and GGL_PIXEL_FORMAT_RGBA_8888
+number of lms in topology 2
+Atomic Commit succeedUsing drm graphics.
+I:TWFunc::Set_Brightness: Setting brightness control to 420
+I:Loading package: splash (/twres/splash.xml)
+I:Load XML directly
+I:PageManager::LoadFileToBuffer loading filename: '/twres/splash.xml' directly
+I:Checking resolution...
+I:Scaling theme width 1.166667x and height 1.000000x, offsets x: 0 y: 0 w: 0 h: 0
+I:Loading resources...
+I:Loading variables...
+I:Loading mouse cursor...
+I:Loading pages...
+I:Loading page splash
+I:Switching packages (splash)
+I:Can't probe device /dev/block/sda14
+I:Unable to mount '/data'
+I:Actual block device: '/dev/block/sda14', current file system: 'f2fs'
+I:Apex is disabled in this build
+I:Using automatic handling for /data/media emulated storage device.
+I:Setting up '/data' as data/media emulated storage.
+I:Can't probe device /dev/block/sda14
+I:Unable to mount '/data'
+I:Actual block device: '/dev/block/sda14', current file system: 'f2fs'
+I:Backup folder set to '/data/media/Fox/BACKUPS/00015356P000230'
+I:Settings storage is '/data/media'
+Using additional fstab for decryption /etc/additional.fstab 
