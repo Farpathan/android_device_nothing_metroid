@@ -24,7 +24,7 @@
 # components.
 
 # SDK
-BOARD_SYSTEMSDK_VERSIONS := 31
+BOARD_SYSTEMSDK_VERSIONS := 35
 
 # Architecture
 TARGET_ARCH := arm64
@@ -82,7 +82,7 @@ BOARD_FLASH_BLOCK_SIZE := 262144 # (BOARD_KERNEL_PAGESIZE * 64) #TODO
 BOARD_SUPER_PARTITION_SIZE := 9126805504
 BOARD_SUPER_PARTITION_GROUPS := qti_dynamic_partitions
 BOARD_QTI_DYNAMIC_PARTITIONS_SIZE := 9122611200 # BOARD_SUPER_PARTITION_SIZE - 4MB
-BOARD_QTI_DYNAMIC_PARTITIONS_PARTITION_LIST := system system_ext product vendor odm
+BOARD_QTI_DYNAMIC_PARTITIONS_PARTITION_LIST := system system_ext product vendor vendor_dlkm system_dlkm odm
 
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 104857600
 
@@ -142,8 +142,8 @@ TARGET_VENDOR_PROP += $(DEVICE_PATH)/vendor.prop
 TARGET_RECOVERY_QCOM_RTC_FIX := true
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 TW_THEME := portrait_hdpi
-TW_CUSTOM_CPU_TEMP_PATH := "/sys/devices/virtual/thermal/thermal_zone34/temp"
-TW_BRIGHTNESS_PATH := "/sys/devices/platform/soc/ae00000.qcom,cmdss_mdp/backlight/panel0-backlight/brightness"
+# TW_CUSTOM_CPU_TEMP_PATH := "/sys/devices/virtual/thermal/thermal_zone34/temp" # thermal_zone34 reports camera-1, not CPU
+# TW_BRIGHTNESS_PATH := "/sys/devices/platform/soc/ae00000.qcom,cmdss_mdp/backlight/panel0-backlight/brightness" # Path doesn't exist on device - let TWRP auto-detect
 TW_STATUS_ICONS_ALIGN := center
 TW_CUSTOM_CPU_POS := "50"
 TW_CUSTOM_CLOCK_POS := "290"

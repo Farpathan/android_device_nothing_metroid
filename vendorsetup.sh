@@ -50,9 +50,9 @@ export OF_STATUS_INDENT_RIGHT=48
 export OF_DEFAULT_KEYMASTER_VERSION=4.1
 export OF_ALLOW_DISABLE_NAVBAR=0
 export OF_CLOCK_POS=0
-export OF_SCREEN_H=2400
+export OF_SCREEN_H=2800
 export OF_STATUS_H=120
-export FOX_USE_SPECIFIC_MAGISK_ZIP=/home/toor/Magisk-v28.0.apk
+# export FOX_USE_SPECIFIC_MAGISK_ZIP=/home/toor/Magisk-v28.0.apk  # Commented: hardcoded path won't work on other systems
 
 # Device Stuff
 export OF_NO_TREBLE_COMPATIBILITY_CHECK=1
