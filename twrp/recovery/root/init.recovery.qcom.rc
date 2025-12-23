@@ -24,71 +24,13 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-import /init.recovery.qcom_decrypt.rc
-
-on init
-    start boot-hal-1-2
+# Minimal init.rc for Nothing Phone (3) OrangeFox Recovery
+# All external service dependencies REMOVED to prevent crash-loops
 
 on fs
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
     write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
 
-on early-init
-    # Load kernel modules for Q6/DSP and QSEE communication
-    insmod /vendor/lib/modules/q6_dlkm.ko
-    insmod /vendor/lib/modules/q6_pdr_dlkm.ko
-    insmod /vendor/lib/modules/q6_notifier_dlkm.ko
-    insmod /vendor/lib/modules/glink_pkt.ko
-    insmod /vendor/lib/modules/glink_probe.ko
-    insmod /vendor/lib/modules/qcom_glink.ko
-    insmod /vendor/lib/modules/qcom_glink_smem.ko
-    insmod /vendor/lib/modules/qcom_glink_spss.ko
-    insmod /vendor/lib/modules/rproc_qcom_common.ko
-    insmod /vendor/lib/modules/qcom_q6v5.ko
-    insmod /vendor/lib/modules/qcom_q6v5_pas.ko
-    insmod /vendor/lib/modules/qcom_sysmon.ko
-    # QSEE/TrustZone modules
-    insmod /vendor/lib/modules/tz_log_dlkm.ko
-    insmod /vendor/lib/modules/qseecom_proxy.ko
-    insmod /vendor/lib/modules/hdcp_qseecom_dlkm.ko
-    # ADSP loader
-    insmod /vendor/lib/modules/adsp_loader_dlkm.ko
-
-on post-fs
-    mount none /system/etc/dummy_vibrator.xml /vendor/etc/vintf/manifest/vendor.qti.hardware.vibrator.service.xml bind
-    # KeyMint manifest NOT overridden - real service will register
-    mount none /system/etc/dummy_health.xml /vendor/etc/vintf/manifest/android.hardware.health-service.qti.xml bind
-
-# IPC Router Name Service - required for DSP communication
-service qrtr-ns /vendor/bin/qrtr-ns -f
-    user root
-    group root
-    disabled
-    seclabel u:r:recovery:s0
-
-# Protection Domain Mapper - required for DSP service mapping
-service pd-mapper /vendor/bin/pd-mapper
-    user root
-    group root
-    disabled
-    seclabel u:r:recovery:s0
-
 on boot
     setprop sys.usb.config adb
-
-on property:twrp.modules.loaded=true
-    # Mount firmware
-    mkdir /firmware
-    mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
-    # Start IPC services first (required for DSP communication)
-    start qrtr-ns
-    # Start ADSP processor via remoteproc interface
-    write /sys/class/remoteproc/remoteproc1/state start
-    # Wait for QRTR to initialize
-    wait /dev/socket/qrtr-ns 2
-    start pd-mapper
-    # Start hardware services
-    start health-hal-2-1
-    start vendor.qti.vibrator
