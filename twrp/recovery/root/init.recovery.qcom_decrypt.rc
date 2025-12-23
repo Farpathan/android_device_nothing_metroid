@@ -1,44 +1,33 @@
 # Copyright (c) 2023 The Android Open Source Project
 # FBE Decryption services for Nothing Phone (3)
+#
+# NOTE: qseecomd and vendor crypto services are DISABLED
+# because they require full vendor libs which we can't include.
+# TWRP's built-in BOARD_USES_QCOM_FBE_DECRYPTION handles crypto instead.
 
-# qseecomd - QSEE communication daemon
-service qseecomd /vendor/bin/qseecomd
-    user root
-    group root drmrpc system
-    disabled
-    setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64:/vendor/lib:/system/lib:/sbin
-    seclabel u:r:recovery:s0
+# The services below are commented out to prevent crash-loops
+# which block recovery UI initialization.
 
-# KeyMint service - provides encryption key management
-service vendor.keymint-qti /vendor/bin/hw/android.hardware.security.keymint-service-qti
-    user root
-    group root drmrpc system
-    disabled
-    setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64:/vendor/lib:/system/lib:/sbin
-    seclabel u:r:recovery:s0
+# service qseecomd /vendor/bin/qseecomd
+#     user root
+#     group root drmrpc system
+#     disabled
+#     setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64:/vendor/lib:/system/lib:/sbin
+#     seclabel u:r:recovery:s0
 
-# Gatekeeper service - provides credential verification
-service vendor.gatekeeper-qti /vendor/bin/hw/android.hardware.gatekeeper-service-qti
-    user root
-    group root
-    disabled
-    setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64:/vendor/lib:/system/lib:/sbin
-    seclabel u:r:recovery:s0
+# service vendor.keymint-qti /vendor/bin/hw/android.hardware.security.keymint-service-qti
+#     user root
+#     group root drmrpc system
+#     disabled
+#     setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64:/vendor/lib:/system/lib:/sbin
+#     seclabel u:r:recovery:s0
 
-on property:crypto.ready=1
-    # Start crypto services when crypto is ready
-    start qseecomd
-    start vendor.keymint-qti
-    start vendor.gatekeeper-qti
+# service vendor.gatekeeper-qti /vendor/bin/hw/android.hardware.gatekeeper-service-qti
+#     user root
+#     group root
+#     disabled
+#     setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64:/vendor/lib:/system/lib:/sbin
+#     seclabel u:r:recovery:s0
 
-on property:twrp.decrypt.done=true
-    # Crypto services started after successful decryption trigger
-    start qseecomd
-    start vendor.keymint-qti
-    start vendor.gatekeeper-qti
-
-on property:hwservicemanager.ready=true
-    # Ensure crypto services start when hwservicemanager is ready
-    start qseecomd
-    start vendor.keymint-qti
-    start vendor.gatekeeper-qti
+# TWRP handles decryption via its built-in qcom_decrypt binary
+# No need to start external crypto services
