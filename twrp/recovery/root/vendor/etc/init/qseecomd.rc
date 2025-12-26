@@ -1,0 +1,16 @@
+# Copyright (c) 2021 Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+
+service qseecomd /system/bin/qseecomd
+    class core
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+on property:sys.listeners.registered=true
+    setprop vendor.sys.listeners.registered true
+
+on fs
+    start qseecomd
