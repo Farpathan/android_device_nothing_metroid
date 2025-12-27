@@ -11,6 +11,7 @@ service vendor.ssgtzd /vendor/bin/ssgtzd
     class late_start
     user root
     group root drmrpc
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/system/lib64:/sbin
     capabilities WAKE_ALARM BLOCK_SUSPEND
     disabled
     socket ssgtzd stream 0660 root drmrpc
