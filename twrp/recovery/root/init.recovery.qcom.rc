@@ -68,7 +68,7 @@ on fs
 
     # Load all modules from vendor_dlkm using script
     chmod 0755 /system/bin/load_modules.sh
-    exec /system/bin/load_modules.sh
+    exec -- /system/bin/load_modules.sh
 
 on post-fs
     # Keep vibrator and health dummy mounts (non-critical for decryption)
