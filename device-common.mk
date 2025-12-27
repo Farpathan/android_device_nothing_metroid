@@ -108,9 +108,14 @@ PRODUCT_PACKAGES += \
     qcom_decrypt \
     qcom_decrypt_fbe
 
+# libc++ compatibility stub for Android 15 vendor binaries
+PRODUCT_PACKAGES += \
+    libcpp_compat
+
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \
-    $(DEVICE_PATH)
+    $(DEVICE_PATH) \
+    $(DEVICE_PATH)/libcpp_compat
 
 #namespace definition for librecovery_updater
 #differentiate legacy 'sg' or 'bsg' framework

@@ -2,8 +2,8 @@
 # All Rights Reserved.
 # Confidential and Proprietary - Qualcomm Technologies, Inc.
 
-service vendor.gatekeeper-qti /system/bin/android.hardware.gatekeeper@1.0-service-qti
-    interface android.hardware.gatekeeper@1.0::IGatekeeper default
+service vendor.gatekeeper-qti /system/bin/android.hardware.gatekeeper-service-qti
+    interface aidl android.hardware.gatekeeper.IGatekeeper/default
     class early_hal
     user root
     group root
