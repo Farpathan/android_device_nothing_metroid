@@ -39,7 +39,19 @@ on fs
     mkdir /vendor_dlkm
     mount erofs /dev/block/bootdevice/by-name/vendor_dlkm /vendor_dlkm ro
     mount ext4 /dev/block/bootdevice/by-name/vendor_dlkm /vendor_dlkm ro
+
+    # Mount firmware, dsp, and persist early for qseecom requirements
+    mkdir /firmware
+    mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
+    mkdir /vendor/dsp
+    mount ext4 /dev/block/bootdevice/by-name/dsp${ro.boot.slot_suffix} /vendor/dsp ro
+    mkdir /mnt/vendor/persist
+    mount ext4 /dev/block/bootdevice/by-name/persist /mnt/vendor/persist
     
+    # Symlink firmware path for strict drivers
+    mkdir /vendor/firmware_mnt
+    mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /vendor/firmware_mnt ro
+
     # Load all modules from vendor_dlkm using script
     chmod 0755 /system/bin/load_modules.sh
     exec /system/bin/load_modules.sh
