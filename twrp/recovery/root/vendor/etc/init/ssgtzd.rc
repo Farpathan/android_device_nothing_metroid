@@ -1,0 +1,17 @@
+# Copyright (c) 2019 Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+# TrustZone Security Daemon for recovery decryption
+
+on property:vendor.sys.listeners.registered=true
+    start vendor.ssgtzd
+
+service vendor.ssgtzd /vendor/bin/ssgtzd
+    class late_start
+    user root
+    group root drmrpc
+    capabilities WAKE_ALARM BLOCK_SUSPEND
+    disabled
+    socket ssgtzd stream 0660 root drmrpc
+    seclabel u:r:recovery:s0

@@ -2,17 +2,18 @@
 # All Rights Reserved.
 # Confidential and Proprietary - Qualcomm Technologies, Inc.
 
-service qseecomd /system/bin/qseecomd
+on init
+    start vendor.qseecomd
+
+service vendor.qseecomd /system/bin/qseecomd
+    socket notify-topology stream 660 system drmrpc
     class core
     user root
-    group root
+    group root drmrpc
     setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
-    setenv LD_PRELOAD /system/lib64/libcpp_compat.so
-    disabled
+    setenv LD_PRELOAD /vendor/lib64/libc++_v36.so
     seclabel u:r:recovery:s0
 
 on property:sys.listeners.registered=true
     setprop vendor.sys.listeners.registered true
 
-on fs
-    start qseecomd

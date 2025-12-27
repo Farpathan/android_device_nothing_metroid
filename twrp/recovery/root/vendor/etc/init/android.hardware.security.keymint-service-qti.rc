@@ -2,13 +2,13 @@
 # All Rights Reserved.
 # Confidential and Proprietary - Qualcomm Technologies, Inc.
 
-on property:hwservicemanager.ready=true && property:vendor.sys.listeners.registered=true
+on init
     start keymint-qti
 
 service keymint-qti /system/bin/android.hardware.security.keymint-service-qti
+    class early_hal
     user root
-    group root
+    group root drmrpc
     setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
-    setenv LD_PRELOAD /system/lib64/libcpp_compat.so
-    disabled
+    setenv LD_PRELOAD /vendor/lib64/libc++_v36.so
     seclabel u:r:recovery:s0

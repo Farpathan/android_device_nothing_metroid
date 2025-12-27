@@ -28,7 +28,7 @@
 import /init.recovery.qcom_decrypt.rc
 
 on init
-    export LD_PRELOAD /system/lib64/libcpp_compat.so
+    # Boot HAL for recovery
     start boot-hal-1-2
 
 on fs
