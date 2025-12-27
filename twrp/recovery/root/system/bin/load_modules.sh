@@ -18,3 +18,5 @@ for i in 1 2 3; do
 done
 
 echo "Module loading complete" > /dev/kmsg
+setprop vendor.modules.ready 1
+exit 0
