@@ -52,6 +52,16 @@ on fs
     mkdir /vendor/firmware_mnt
     mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /vendor/firmware_mnt ro
 
+    # Hack to satisfy qseecomd storage requirements in recovery
+    # We must shadow /data with tmpfs to provide writable storage for listener nodes
+    mount tmpfs tmpfs /data size=10M mode=0771,uid=1000,gid=1000
+    mkdir /data/vendor 0771 system system
+    mkdir /data/vendor/qseecom 0770 system drmrpc
+    
+    # Force Permissive to avoid denials on smcinvoke/rpmb
+    setenforce 0
+    write /sys/fs/selinux/enforce 0
+
     # Load all modules from vendor_dlkm using script
     chmod 0755 /system/bin/load_modules.sh
     exec /system/bin/load_modules.sh
