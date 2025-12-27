@@ -3,10 +3,11 @@
 # Confidential and Proprietary - Qualcomm Technologies, Inc.
 
 on init
-    start keymint-qti
+    start vendor.keymint-qti
 
-service keymint-qti /system/bin/sh /system/bin/keymint_wrapper.sh
+service vendor.keymint-qti /system/bin/android.hardware.security.keymint-service-qti
     class early_hal
     user root
     group root drmrpc
     seclabel u:r:recovery:s0
+

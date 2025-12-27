@@ -1,1 +1,0 @@
-CANNOT LINK EXECUTABLE "/sbin/qseecomd": library "libseclog.so" not found: needed by /system/lib64/libdrmfs.so in namespace (default)
