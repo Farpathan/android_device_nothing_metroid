@@ -66,10 +66,10 @@ on fs
     # Symlink RPMB device (qseecomd expects rpmb0, kernel provides ufs-bsg0)
     symlink /dev/ufs-bsg0 /dev/rpmb0
 
-    # Load all modules from vendor_dlkm using service
+    # Load all modules from vendor_dlkm using service (non-blocking)
     chmod 0755 /system/bin/load_modules.sh
     start vendor.load_modules
-    wait_for_prop vendor.modules.ready 1
+    # Note: Service runs in background, qseecomd will start after modules loaded
 
 on post-fs
     # Keep vibrator and health dummy mounts (non-critical for decryption)
