@@ -2,8 +2,6 @@ cc_library_shared {
     name: "libcpp_compat",
     recovery: true,
     recovery_available: true,
-    vendor: true,
-    vendor_available: true,
     
     srcs: [
         "libcpp_compat_stub.cpp",
@@ -17,15 +15,7 @@ cc_library_shared {
     
     shared_libs: [
         "libc",
-        "liblog",
-    ],
-    
-    ldflags: [
-        "-Wl,--no-undefined",
     ],
     
     compile_multilib: "64",
-    
-    // Install to both system and vendor
-    proprietary: true,
 }
