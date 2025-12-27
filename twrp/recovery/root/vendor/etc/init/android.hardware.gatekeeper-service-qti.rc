@@ -8,6 +8,7 @@ service vendor.gatekeeper-qti /system/bin/android.hardware.gatekeeper-service-qt
     user root
     group root
     setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
+    setenv LD_PRELOAD /system/lib64/libcpp_compat.so
     disabled
     seclabel u:r:recovery:s0
 
