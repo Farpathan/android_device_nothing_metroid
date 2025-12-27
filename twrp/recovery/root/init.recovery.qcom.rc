@@ -28,8 +28,15 @@
 import /init.recovery.qcom_decrypt.rc
 
 on init
-    insmod /vendor/lib/modules/tz_log_dlkm.ko
-    insmod /vendor/lib/modules/qseecom_proxy.ko
+    # Mount vendor_dlkm to access kernel modules
+    mkdir /vendor_dlkm
+    mount erofs /dev/block/bootdevice/by-name/vendor_dlkm /vendor_dlkm ro
+    mount ext4 /dev/block/bootdevice/by-name/vendor_dlkm /vendor_dlkm ro
+    
+    # Load all modules from vendor_dlkm using script
+    chmod 0755 /system/bin/load_modules.sh
+    exec /system/bin/load_modules.sh
+    
     start boot-hal-1-2
 
 on fs
