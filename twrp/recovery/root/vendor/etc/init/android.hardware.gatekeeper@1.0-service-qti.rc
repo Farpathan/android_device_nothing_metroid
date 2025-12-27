@@ -1,0 +1,17 @@
+# Copyright (c) 2021 Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+# Gatekeeper service for recovery decryption
+
+on property:vendor.sys.listeners.registered=true
+    start gatekeeper-1-0-qti
+
+service gatekeeper-1-0-qti /system/bin/android.hardware.gatekeeper@1.0-service-qti
+    user root
+    group root
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
+    setenv LD_PRELOAD /system/lib64/libcpp_compat.so
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0

@@ -1,0 +1,18 @@
+# Copyright (c) 2021 Qualcomm Technologies, Inc.
+# All Rights Reserved.
+# Confidential and Proprietary - Qualcomm Technologies, Inc.
+#
+# Fallback keymaster@4.1 service for recovery decryption
+# Used when keymint-service-qti fails
+
+on property:vendor.sys.listeners.registered=true
+    start keymaster-4-1-qti
+
+service keymaster-4-1-qti /system/bin/android.hardware.keymaster@4.1-service-qti
+    user root
+    group root
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
+    setenv LD_PRELOAD /system/lib64/libcpp_compat.so
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0
