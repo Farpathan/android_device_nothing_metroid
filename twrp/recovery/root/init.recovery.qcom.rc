@@ -61,6 +61,9 @@ on fs
     # Force Permissive to avoid denials on smcinvoke/rpmb
     setenforce 0
     write /sys/fs/selinux/enforce 0
+    
+    # Symlink RPMB device (qseecomd expects rpmb0, kernel provides ufs-bsg0)
+    symlink /dev/ufs-bsg0 /dev/rpmb0
 
     # Load all modules from vendor_dlkm using script
     chmod 0755 /system/bin/load_modules.sh
