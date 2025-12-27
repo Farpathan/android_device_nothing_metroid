@@ -28,6 +28,8 @@
 import /init.recovery.qcom_decrypt.rc
 
 on init
+    insmod /vendor/lib/modules/tz_log_dlkm.ko
+    insmod /vendor/lib/modules/qseecom_proxy.ko
     start boot-hal-1-2
 
 on fs
