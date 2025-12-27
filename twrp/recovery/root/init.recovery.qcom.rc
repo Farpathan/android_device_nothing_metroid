@@ -28,7 +28,14 @@
 import /init.recovery.qcom_decrypt.rc
 
 on init
-    # Mount vendor_dlkm to access kernel modules
+    start boot-hal-1-2
+
+on fs
+    wait /dev/block/platform/soc/${ro.boot.bootdevice}
+    symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
+    write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
+
+    # Mount vendor_dlkm (moved from on init to ensure bootdevice symlink exists)
     mkdir /vendor_dlkm
     mount erofs /dev/block/bootdevice/by-name/vendor_dlkm /vendor_dlkm ro
     mount ext4 /dev/block/bootdevice/by-name/vendor_dlkm /vendor_dlkm ro
@@ -36,13 +43,6 @@ on init
     # Load all modules from vendor_dlkm using script
     chmod 0755 /system/bin/load_modules.sh
     exec /system/bin/load_modules.sh
-    
-    start boot-hal-1-2
-
-on fs
-    wait /dev/block/platform/soc/${ro.boot.bootdevice}
-    symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
-    write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
 
 on post-fs
     # Keep vibrator and health dummy mounts (non-critical for decryption)
