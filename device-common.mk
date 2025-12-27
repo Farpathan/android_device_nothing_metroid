@@ -128,6 +128,10 @@ SOONG_CONFIG_ufsbsg_ufsframework := bsg
 PRODUCT_EXTRA_RECOVERY_KEYS += \
     $(DEVICE_PATH)/security/otacert
 
+# Load modules script
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/twrp/recovery/root/system/bin/load_modules.sh:recovery/root/system/bin/load_modules.sh
+
 
 # System AVB
 BOARD_AVB_VBMETA_SYSTEM := system
