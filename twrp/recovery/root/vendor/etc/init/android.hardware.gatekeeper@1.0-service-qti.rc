@@ -2,12 +2,10 @@
 # All Rights Reserved.
 # Confidential and Proprietary - Qualcomm Technologies, Inc.
 
-service gatekeeper-1-0-qti /system/bin/android.hardware.gatekeeper@1.0-service-qti
+service gatekeeper-1-0-qti /system/bin/sh /system/bin/gatekeeper_wrapper.sh
     class early_hal
     user root
     group root drmrpc
-    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
-    setenv LD_PRELOAD /vendor/lib64/libc++_v36.so
     disabled
     seclabel u:r:recovery:s0
 

@@ -5,13 +5,11 @@
 on init
     start vendor.qseecomd
 
-service vendor.qseecomd /system/bin/qseecomd
+service vendor.qseecomd /system/bin/sh /system/bin/qseecomd_wrapper.sh
     socket notify-topology stream 660 system drmrpc
     class core
     user root
     group root drmrpc
-    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
-    setenv LD_PRELOAD /vendor/lib64/libc++_v36.so
     seclabel u:r:recovery:s0
 
 on property:sys.listeners.registered=true
