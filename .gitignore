@@ -1,1 +1,12 @@
-/android_device_nothing_Pong-pbrp/
+# Build artifacts
+out/
+
+# IDE files
+.vscode/
+.idea/
+*.sw[a-p]
+*.swp
+*~
+
+# Specific folder to ignore
+android_device_nothing_Pong-pbrp/
