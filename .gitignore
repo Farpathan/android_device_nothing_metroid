@@ -7,3 +7,6 @@ out/
 *.sw[a-p]
 *.swp
 *~
+
+/crypto_extract/
+/debug_screenshots/
