@@ -29,7 +29,8 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
 
 # Installs gsi keys into ramdisk, to boot a GSI with verified boot.
-$(call inherit-product, $(SRC_TARGET_DIR)/product/gsi_keys.mk)
+# Note: gsi_keys.mk may not exist in all PBRP branches
+-include $(SRC_TARGET_DIR)/product/gsi_keys.mk
 
 # Platform
 QCOM_BOARD_PLATFORMS += $(PRODUCT_PLATFORM)
