@@ -1,10 +1,27 @@
-# Android device tree for Nothing A024 (Metroid)
+# Android Device Tree for Nothing Phone (3) - Metroid
 
-```
-#
-# Copyright (C) 2025 The Android Open Source Project
-# Copyright (C) 2025 SebaUbuntu's TWRP device tree generator
-#
-# SPDX-License-Identifier: Apache-2.0
-#
-```
+OrangeFox Recovery device tree for Nothing Phone (3) (codename: Metroid, model: A024)
+
+## Device Specifications
+
+| Feature  | Specification                  |
+| -------- | ------------------------------ |
+| Chipset  | Qualcomm Snapdragon 8s Gen 4   |
+| Platform | sun                            |
+| CPU      | Octa-core                      |
+| GPU      | Adreno                         |
+| Memory   | 8/12 GB                        |
+| Storage  | 256/512 GB                     |
+| Display  | 6.7" 1080 x 2400 pixels, 120Hz |
+
+## Current Status
+
+| Feature        | Status               |
+| -------------- | -------------------- |
+| Boot           | ✅ Working           |
+| Touch          | ✅ Working           |
+| ADB            | ✅ Working           |
+| USB-OTG        | ✅ Working           |
+| Sideload       | ✅ Working           |
+| Backup/Restore | ✅ Working           |
+| Encryption     | ❌ Not Working (WIP) |
