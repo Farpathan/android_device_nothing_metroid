@@ -15,5 +15,4 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/twrp_Metroid.mk \
     $(LOCAL_DIR)/pb_Metroid.mk

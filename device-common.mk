@@ -1,5 +1,6 @@
 # Copyright (C) 2016 The CyanogenMod Project
 # Copyright (C) 2019 The OmniRom Project
+# Copyright (C) 2025 PitchBlack Recovery Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,11 +37,6 @@ TARGET_BOARD_PLATFORM := $(PRODUCT_PLATFORM)
 TARGET_BOOTLOADER_BOARD_NAME := $(TARGET_BOARD_PLATFORM)
 
 BUILD_BROKEN_DUP_RULES := true
-
-#KEYMASTER STUFF
-
-#OF_DEFAULT_KEYMASTER_VERSION := 4.1
-#TW_FORCE_KEYMASTER_VER := false
 
 RELAX_USES_LIBRARY_CHECK := true
 
@@ -91,7 +87,7 @@ BOARD_API_LEVEL := 31
 SHIPPING_API_LEVEL := 31
 PRODUCT_SHIPPING_API_LEVEL := 31
 
-#Support to compile recovery without msm headers
+# Support to compile recovery without msm headers
 TARGET_HAS_GENERIC_KERNEL_HEADERS := true
 
 # Dynamic partitions
@@ -112,8 +108,8 @@ PRODUCT_PACKAGES += android.hardware.fastboot@1.1-impl-mock
 PRODUCT_SOONG_NAMESPACES += \
     $(DEVICE_PATH)
 
-#namespace definition for librecovery_updater
-#differentiate legacy 'sg' or 'bsg' framework
+# Namespace definition for librecovery_updater
+# Differentiate legacy 'sg' or 'bsg' framework
 SOONG_CONFIG_NAMESPACES += ufsbsg
 
 SOONG_CONFIG_ufsbsg += ufsframework
@@ -122,7 +118,6 @@ SOONG_CONFIG_ufsbsg_ufsframework := bsg
 # OEM otacerts
 PRODUCT_EXTRA_RECOVERY_KEYS += \
     $(DEVICE_PATH)/security/otacert
-
 
 # System AVB
 BOARD_AVB_VBMETA_SYSTEM := system
@@ -134,4 +129,5 @@ BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 2
 # Enable Fuse Passthrough
 PRODUCT_PROPERTY_OVERRIDES += persist.sys.fuse.passthrough.enable=true
 
+# Recovery device directory
 TARGET_RECOVERY_DEVICE_DIRS += $(DEVICE_PATH)/twrp

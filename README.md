@@ -1,6 +1,6 @@
 # Android Device Tree for Nothing Phone (3) - Metroid
 
-Recovery device tree for Nothing Phone (3) (codename: Metroid, model: A024)
+PitchBlack Recovery Project (PBRP) device tree for Nothing Phone (3) (codename: Metroid, model: A024)
 
 ## Device Specifications
 
@@ -14,51 +14,78 @@ Recovery device tree for Nothing Phone (3) (codename: Metroid, model: A024)
 | Storage  | 256/512 GB                     |
 | Display  | 6.7" 1080 x 2400 pixels, 120Hz |
 
-## Supported Recoveries
-
-This device tree supports building:
-
-- **OrangeFox Recovery** - use `twrp_Metroid` target
-- **PitchBlack Recovery (PBRP)** - use `pb_Metroid` target
-
 ## Build Instructions
 
-### OrangeFox Recovery
+### Prerequisites
+
+- Ubuntu 20.04 or later (or compatible Linux distribution)
+- At least 100GB free disk space
+- 16GB+ RAM recommended
+
+### Setup Build Environment
 
 ```bash
-# Initialize OrangeFox source
-repo init -u https://gitlab.com/OrangeFox/sync.git -b fox_12.1
+# Install required packages
+sudo apt update
+sudo apt install git-core gnupg flex bison build-essential zip curl zlib1g-dev \
+    libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev \
+    libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig python3
 
-# Sync source
-repo sync
-
-# Clone device tree
-git clone https://github.com/YourUsername/android_device_nothing_metroid.git device/nothing/Metroid
-
-# Build
-source build/envsetup.sh
-export ALLOW_MISSING_DEPENDENCIES=true
-export FOX_BUILD_DEVICE=Metroid
-lunch twrp_Metroid-eng
-mka recoveryimage
+# Install repo tool
+mkdir -p ~/bin
+curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+chmod a+x ~/bin/repo
+export PATH=~/bin:$PATH
 ```
 
-### PitchBlack Recovery (PBRP)
+### Initialize and Sync PBRP Source
 
 ```bash
-# Initialize PBRP source
+# Create working directory
+mkdir pbrp && cd pbrp
+
+# Initialize PBRP source (android-12.1 branch)
 repo init -u https://github.com/PitchBlackRecoveryProject/manifest_pb -b android-12.1
 
-# Sync source
-repo sync
+# Sync source (this will take a while)
+repo sync -j$(nproc --all)
+```
 
-# Clone device tree
-git clone https://github.com/YourUsername/android_device_nothing_metroid.git device/nothing/Metroid
+### Clone Device Tree
 
-# Build
+```bash
+git clone https://github.com/YourUsername/android_device_nothing_Metroid-pbrp.git device/nothing/Metroid
+```
+
+### Build PBRP
+
+```bash
+# Setup build environment
 source build/envsetup.sh
+
+# Select device
 lunch pb_Metroid-eng
+
+# Build recovery
 mka pbrp
+```
+
+The recovery image will be located at `out/target/product/Metroid/recovery.img`
+
+## Flashing Instructions
+
+```bash
+# Boot to bootloader
+adb reboot bootloader
+
+# Flash recovery (slot a)
+fastboot flash recovery_a recovery.img
+
+# Flash recovery (slot b)
+fastboot flash recovery_b recovery.img
+
+# Reboot to recovery
+fastboot reboot recovery
 ```
 
 ## Current Status
@@ -73,11 +100,15 @@ mka pbrp
 | Backup/Restore | ✅ Working           |
 | Encryption     | ❌ Not Working (WIP) |
 
+## Credits
+
+- [PitchBlack Recovery Project](https://pitchblackrecovery.com/)
+- [Nothing Phone (2) PBRP Tree](https://github.com/PitchBlackRecoveryProject/android_device_nothing_Pong-pbrp)
+
 ## License
 
 ```
 Copyright (C) 2025 The Android Open Source Project
-Copyright (C) 2025 OrangeFox Recovery Project
 Copyright (C) 2025 PitchBlack Recovery Project
 
 SPDX-License-Identifier: Apache-2.0

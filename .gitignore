@@ -7,6 +7,3 @@ out/
 *.sw[a-p]
 *.swp
 *~
-
-# Specific folder to ignore
-android_device_nothing_Pong-pbrp/
