@@ -25,7 +25,8 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import /init.recovery.qcom_decrypt.rc
+# TEMPORARILY DISABLED to test splash page transition
+# import /init.recovery.qcom_decrypt.rc
 
 on init
     start boot-hal-1-2
