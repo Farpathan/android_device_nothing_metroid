@@ -1,0 +1,128 @@
+# ifdef NT_EDIT
+# NT_EDIT added for ARBOK-149: add for vibrator bringup
+# NT_EDIT BEE-447 for vibrator cali begin
+on fs
+    mkdir /mnt/vendor/persist/haptic 0777 system system
+    chmod 0771 /mnt/vendor/persist/haptic
+    chown system system /mnt/vendor/persist/haptic
+    chmod 0771 /mnt/vendor/persist/haptic/cali_data
+    chown system system /mnt/vendor/persist/haptic/cali_data
+    chmod 0771 /mnt/vendor/persist/haptic/cali_gpp_data
+    chown system system /mnt/vendor/persist/haptic/cali_gpp_data
+    chmod 0771 /mnt/vendor/persist/haptic/sample_param
+    chown system system /mnt/vendor/persist/haptic/sample_param
+    chmod 0771 /mnt/vendor/persist/haptic/RT_sample_param
+    chown system system /mnt/vendor/persist/haptic/RT_sample_param
+#NT_EDIT BEE-447 for vibrator cali end
+
+# ifdef NT_EDIT
+# modify for vibrator lcc on off
+on property:persist.vendor.sfdc=true
+    write /mnt/vendor/persist/haptic/sfdc 1
+    chmod 0771 /mnt/vendor/persist/haptic/sfdc
+    chown system system /mnt/vendor/persist/haptic/sfdc
+
+on property:persist.vendor.sfdc=false
+    write /mnt/vendor/persist/haptic/sfdc 0
+    chmod 0771 /mnt/vendor/persist/haptic/sfdc
+    chown system system /mnt/vendor/persist/haptic/sfdc
+# endif NT_EDIT
+
+on post-fs-data
+    chmod 0666 /dev/aw86927_haptic
+    chown system system /dev/aw86927_haptic
+    chmod 0666 /proc/haptic/f0
+    chown system system /proc/haptic/f0
+    chmod 0666 /proc/haptic/lra_resistance
+    chown system system /proc/haptic/lra_resistance
+    chmod 0666 /proc/haptic/gpp
+    chown system system /proc/haptic/gpp
+    chmod 0666 /sys/class/leds/vibrator_nt/chip_id
+    chown system system /sys/class/leds/vibrator_nt/chip_id
+    chmod 0666 /sys/class/leds/vibrator_nt/enalbe
+    chown system system /sys/class/leds/vibrator_nt/enalbe
+    chmod 0666 /sys/class/leds/vibrator_nt/activate
+    chown system system /sys/class/leds/vibrator_nt/activate
+    chmod 0666 /sys/class/leds/vibrator_nt/brightness
+    chown system system /sys/class/leds/vibrator_nt/brightness
+    chmod 0666 /sys/class/leds/vibrator_nt/duration
+    chown system system /sys/class/leds/vibrator_nt/duration
+    chmod 0666 /sys/class/leds/vibrator_nt/f0
+    chown system system /sys/class/leds/vibrator_nt/f0
+    chmod 0666 /sys/class/leds/vibrator_nt/f0_save
+    chown system system /sys/class/leds/vibrator_nt/f0_save
+    chmod 0666 /sys/class/leds/vibrator_nt/ram_cali
+    chown system system /sys/class/leds/vibrator_nt/ram_cali
+    chmod 0666 /sys/class/leds/vibrator_nt/ram_save
+    chown system system /sys/class/leds/vibrator_nt/ram_save
+    chmod 0666 /sys/class/leds/vibrator_nt/cali
+    chown system system /sys/class/leds/vibrator_nt/cali
+    chmod 0666 /sys/class/leds/vibrator_nt/index
+    chown system system /sys/class/leds/vibrator_nt/index
+    chmod 0666 /sys/class/leds/vibrator_nt/reset
+    chown system system /sys/class/leds/vibrator_nt/reset
+    chmod 0666 /sys/class/leds/vibrator_nt/reg
+    chown system system /sys/class/leds/vibrator_nt/reg
+    chmod 0666 /sys/class/leds/vibrator_nt/vmax
+    chown system system /sys/class/leds/vibrator_nt/vmax
+    chmod 0666 /sys/class/leds/vibrator_nt/gain
+    chown system system /sys/class/leds/vibrator_nt/gain
+    chmod 0666 /sys/class/leds/vibrator_nt/rtp
+    chown system system /sys/class/leds/vibrator_nt/rtp
+    chmod 0666 /sys/class/leds/vibrator_nt/playlist
+    chown system system /sys/class/leds/vibrator_nt/playlist
+    chmod 0666 /sys/class/leds/vibrator_nt/waveform
+    chown system system /sys/class/leds/vibrator_nt/waveform
+    chmod 0666 /sys/class/leds/vibrator_nt/play
+    chown system system /sys/class/leds/vibrator_nt/play
+    chmod 0666 /sys/class/leds/vibrator_nt/stream_start
+    chown system system /sys/class/leds/vibrator_nt/stream_start
+    chmod 0666 /sys/class/leds/vibrator_nt/stream_data
+    chown system system /sys/class/leds/vibrator_nt/stream_data
+    chmod 0666 /sys/class/leds/vibrator_nt/vbat
+    chown system system /sys/class/leds/vibrator_nt/vbat
+    chmod 0666 /sys/class/leds/vibrator_nt/lra_resistance
+    chown system system /sys/class/leds/vibrator_nt/lra_resistance
+    chmod 0666 /sys/class/leds/vibrator_nt/state
+    chown system system /sys/class/leds/vibrator_nt/state
+    chmod 0666 /sys/class/leds/vibrator_nt/seq
+    chown system system /sys/class/leds/vibrator_nt/seq
+    chmod 0666 /sys/class/leds/vibrator_nt/loop
+    chown system system /sys/class/leds/vibrator_nt/loop
+    chmod 0666 /sys/class/leds/vibrator_nt/gain
+    chown system system /sys/class/leds/vibrator_nt/gain
+    chmod 0666 /sys/class/leds/vibrator_nt/sample_param
+    chown system system /sys/class/leds/vibrator_nt/sample_param
+    chmod 0666 /sys/class/leds/vibrator_nt/golden_param
+    chown system system /sys/class/leds/vibrator_nt/golden_param
+    chmod 0666 /sys/class/leds/vibrator_nt/lk_f0
+    chown system system /sys/class/leds/vibrator_nt/lk_f0
+    chmod 0666 /sys/class/leds/vibrator_nt/gpp
+    chown system system /sys/class/leds/vibrator_nt/gpp
+    chmod 0666 /sys/class/leds/vibrator_nt/awrw
+    chown system system /sys/class/leds/vibrator_nt/awrw
+    chmod 0666 /sys/class/leds/vibrator_nt/RT_sample_param_result
+    chown system system /sys/class/leds/vibrator_nt/RT_sample_param_result
+    chmod 0666 /sys/class/leds/vibrator_nt/glb_state
+    chown system system /sys/class/leds/vibrator_nt/glb_state
+    chmod 0666 /sys/class/leds/vibrator_nt/haptic_interface_disable
+    chown system system /sys/class/leds/vibrator_nt/haptic_interface_disable
+    chmod 0666 /sys/class/leds/vibrator_nt/auto_brake
+    chown system system /sys/class/leds/vibrator_nt/auto_brake
+
+service vendor.qti.vibrator /vendor/bin/hw/vendor.qti.hardware.vibrator.service
+    class hal
+    user system
+    group system input
+    setenv RICHTAP_DEVICE_PATH  /dev/aw86927_haptic
+    setenv ENV_RICHTAP_CONFIG_PATH /odm/etc/aac_richtap.config
+
+#on late-init
+#    write /sys/class/leds/vibrator/trigger "transient"
+# endif NT_EDIT
+
+on property:sys.boot_completed=1
+    setprop vendor.haptic.calibrate.done 1
+
+on property:persist.sys.sfdc=*
+    setprop persist.vendor.sfdc ${persist.sys.sfdc}
