@@ -22,15 +22,16 @@
 export TARGET_ARCH="arm64"
 
 # About Us
-export FOX_VERSION="RTest1"
+unset FOX_VERSION
+export FOX_MAINTAINER_PATCH_VERSION="1"
 export OF_MAINTAINER="Gigaachad"
-export FOX_BUILD_TYPE="Stable"
+export FOX_BUILD_TYPE="Unofficial"
 
 # Build Environment Stuff
 export FOX_BUILD_DEVICE="Metroid"
 export ALLOW_MISSING_DEPENDENCIES=true
-export TARGET_DEVICE_ALT="Metroid,metroid"
-export FOX_TARGET_DEVICES="Metroid,metroid"
+export TARGET_DEVICE_ALT="Metroid,metroid,A024,MetroidIND"
+export FOX_TARGET_DEVICES="Metroid,metroid,A024,MetroidIND"
 export TW_DEFAULT_LANGUAGE="en"
 export LC_ALL="C"
 export OF_OPTIONS_LIST_NUM=8
@@ -50,16 +51,15 @@ export OF_STATUS_INDENT_RIGHT=48
 export OF_DEFAULT_KEYMASTER_VERSION=4.1
 export OF_ALLOW_DISABLE_NAVBAR=0
 export OF_CLOCK_POS=0
-export OF_SCREEN_H=2400
+export OF_SCREEN_H=2800
 export OF_STATUS_H=120
-export FOX_USE_SPECIFIC_MAGISK_ZIP=/home/toor/Magisk-v28.0.apk
+# export FOX_USE_SPECIFIC_MAGISK_ZIP=""
 
 # Device Stuff
 export OF_NO_TREBLE_COMPATIBILITY_CHECK=1
-export OF_FBE_METADATA_MOUNT_IGNORE=1
+# export OF_FBE_METADATA_MOUNT_IGNORE=1
 export OF_PATCH_AVB20=1
 export FOX_USE_NANO_EDITOR=1
-export FOX_ENABLE_APP_MANAGER=0
 export FOX_DELETE_AROMAFM=1
 export OF_DONT_PATCH_ON_FRESH_INSTALLATION=1
 export OF_FIX_OTA_UPDATE_MANUAL_FLASH_ERROR=1

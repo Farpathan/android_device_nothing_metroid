@@ -142,8 +142,8 @@ TARGET_VENDOR_PROP += $(DEVICE_PATH)/vendor.prop
 TARGET_RECOVERY_QCOM_RTC_FIX := true
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 TW_THEME := portrait_hdpi
-TW_CUSTOM_CPU_TEMP_PATH := "/sys/devices/virtual/thermal/thermal_zone34/temp"
-TW_BRIGHTNESS_PATH := "/sys/devices/platform/soc/ae00000.qcom,cmdss_mdp/backlight/panel0-backlight/brightness"
+TW_CUSTOM_CPU_TEMP_PATH := "/sys/devices/virtual/thermal/thermal_zone22/temp"
+TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel0-backlight/brightness"
 TW_STATUS_ICONS_ALIGN := center
 TW_CUSTOM_CPU_POS := "50"
 TW_CUSTOM_CLOCK_POS := "290"
@@ -169,7 +169,6 @@ RECOVERY_LIBRARY_SOURCE_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/libnetutils.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/libdebuggerd_client.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@1.0.so \
-    $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@2.0.so
 TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_sysmon.ko qcom_glink.ko qcom_glink_smem.ko qti_pmic_glink.ko leds-qpnp-vibrator-ldo.ko haptic.ko panel_event_notifier.ko qti_battery_charger.ko hwmon.ko atmel_mxt_ts.ko focaltech_tp.ko goodix_ts.ko goodix_fp.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 TW_MAX_BRIGHTNESS := 4095

@@ -28,12 +28,13 @@
 import /init.recovery.qcom_decrypt.rc
 
 on init
-    start boot-hal-1-2
+    # Recovery does not require HIDL boot-hal-1-2 service
 
 on fs
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
     write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
+    insmod /vendor/lib/modules/focaltech_tp.ko
 
 on post-fs
     mount none /system/etc/dummy_vibrator.xml /vendor/etc/vintf/manifest/vendor.qti.hardware.vibrator.service.xml bind
@@ -45,14 +46,12 @@ on post-fs
 
 on boot
     setprop sys.usb.config adb
-
-on property:twrp.modules.loaded=true
-    # Mount firmware
+    # Mount firmware for ADSP
     mkdir /firmware
+    wait /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} 2
     mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
-    # Start ADSP processor via remoteproc interface
+    # Start ADSP processor via remoteproc interface (enables PMIC GLINK battery & power supply)
     write /sys/class/remoteproc/remoteproc1/state start
-    # Commented: wait /sys/class/power_supply/battery - causes 5s delay, not critical for recovery
+    wait /sys/class/power_supply/battery/capacity 5
     start health-hal-2-1
-    start vendor.qti.vibrator
-    #umount /firmware
+
