@@ -25,8 +25,6 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import /init.recovery.qcom_decrypt.rc
-
 on init
     # Recovery does not require HIDL boot-hal-1-2 service
 
@@ -35,14 +33,19 @@ on fs
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
     write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
     insmod /vendor/lib/modules/focaltech_tp.ko
+    chmod 0660 /dev/smcinvoke
+    chown root drmrpc /dev/smcinvoke
 
 on post-fs
-    mount none /system/etc/dummy_vibrator.xml /vendor/etc/vintf/manifest/vendor.qti.hardware.vibrator.service.xml bind
-    mount none /system/etc/dummy_keymint.xml /vendor/etc/vintf/manifest/android.hardware.security.keymint-service-qti.xml bind
+    setprop ro.boot.product.vendor.sku tuna
+    setprop vendor.sys.listeners.registered true
+    setprop vendor.gatekeeper.is_security_level_spu 0
     mount none /system/etc/dummy_health.xml /vendor/etc/vintf/manifest/android.hardware.health-service.qti.xml bind
-    # Disable keystore2 in recovery (not needed, causes crash loop due to missing qseecomd/TEE dependencies)
-    stop keystore2
-    setprop keystore.boot_level 0
+    wait /dev/block/bootdevice/by-name/odm 2
+    mount erofs /dev/block/bootdevice/by-name/odm /odm ro
+    start vendor.keymint-qti
+    start vendor.gatekeeper_default
+    start vendor.qti.vibrator
 
 on boot
     setprop sys.usb.config adb
@@ -54,4 +57,31 @@ on boot
     write /sys/class/remoteproc/remoteproc1/state start
     wait /sys/class/power_supply/battery/capacity 5
     start health-hal-2-1
+
+service vendor.keymint-qti /vendor/bin/hw/android.hardware.security.keymint-service-qti
+    class early_hal
+    user root
+    group root drmrpc
+    setenv LD_PRELOAD /system/lib64/libkeymint_compat.so
+    setenv LD_LIBRARY_PATH /vendor/lib64/hw:/vendor/lib64:/system/lib64
+    disabled
+    seclabel u:r:recovery:s0
+
+service vendor.gatekeeper_default /vendor/bin/hw/android.hardware.gatekeeper-service-qti
+    class early_hal
+    user root
+    group root
+    setenv LD_PRELOAD /system/lib64/libkeymint_compat.so
+    setenv LD_LIBRARY_PATH /vendor/lib64/hw:/vendor/lib64:/system/lib64
+    disabled
+    seclabel u:r:recovery:s0
+
+service vendor.qti.vibrator /vendor/bin/hw/vendor.qti.hardware.vibrator.service
+    class early_hal
+    user root
+    group root input
+    setenv LD_PRELOAD /system/lib64/libkeymint_compat.so
+    setenv LD_LIBRARY_PATH /vendor/lib64/hw:/vendor/lib64:/system/lib64
+    disabled
+    seclabel u:r:recovery:s0
 

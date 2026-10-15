@@ -9,8 +9,13 @@ ro.crypto.dm_default_key.options_format.version=2
 ro.crypto.volume.filenames_mode=aes-256-cts
 ro.crypto.volume.metadata.method=dm-default-key
 
-# Gatekeeper
+# Gatekeeper & KeyMint
 vendor.gatekeeper.disable_spu=true
+vendor.gatekeeper.is_security_level_spu=0
+vendor.sys.listeners.registered=true
+
+# Vendor SKU
+ro.boot.product.vendor.sku=tuna
 
 # USB Config
 vendor.usb.use_ffs_mtp=1
