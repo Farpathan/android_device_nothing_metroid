@@ -149,7 +149,7 @@ TW_STATUS_ICONS_ALIGN := center
 TW_CUSTOM_CPU_POS := "50"
 TW_CUSTOM_CLOCK_POS := "290"
 TW_CUSTOM_BATTERY_POS := "800"
-TW_DEFAULT_BRIGHTNESS := 420
+TW_DEFAULT_BRIGHTNESS := 2048
 TW_QCOM_ATS_OFFSET := 1666528204500
 TW_EXCLUDE_APEX := true
 TW_EXCLUDE_DEFAULT_USB_INIT := true
@@ -173,6 +173,8 @@ RECOVERY_LIBRARY_SOURCE_FILES += \
 TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko rproc_qcom_common.ko q6_dlkm.ko qcom_q6v5.ko qcom_q6v5_pas.ko qcom_sysmon.ko qcom_glink.ko qcom_glink_smem.ko qti_pmic_glink.ko leds-qpnp-vibrator-ldo.ko haptic.ko panel_event_notifier.ko qti_battery_charger.ko hwmon.ko atmel_mxt_ts.ko focaltech_tp.ko goodix_ts.ko goodix_fp.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 TW_MAX_BRIGHTNESS := 4095
+TW_NO_SCREEN_TIMEOUT := true
+TW_NO_SCREEN_BLANK := true
 
 # Touch Input Configuration - Force detection of input devices
 TW_NO_INPUT_DEVICES := false

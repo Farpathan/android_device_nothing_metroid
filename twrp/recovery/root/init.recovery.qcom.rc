@@ -71,7 +71,6 @@ on post-fs
     start vendor.gatekeeper_default
     start vendor.keymint-qti
     start keystore2
-    start vendor.qti.vibrator
 
 on boot
     setprop sys.usb.config adb
