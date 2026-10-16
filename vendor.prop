@@ -11,11 +11,7 @@ ro.crypto.volume.metadata.method=dm-default-key
 
 # Gatekeeper & KeyMint
 vendor.gatekeeper.disable_spu=true
-vendor.gatekeeper.is_security_level_spu=0
 vendor.sys.listeners.registered=true
-
-# Vendor SKU
-ro.boot.product.vendor.sku=tuna
 
 # USB Config
 vendor.usb.use_ffs_mtp=1

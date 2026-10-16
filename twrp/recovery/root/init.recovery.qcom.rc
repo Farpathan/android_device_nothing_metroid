@@ -33,16 +33,24 @@ on fs
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
     write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
     insmod /vendor/lib/modules/focaltech_tp.ko
-    chmod 0660 /dev/smcinvoke
-    chown root drmrpc /dev/smcinvoke
+    insmod /vendor/lib/modules/haptic.ko
+    insmod /vendor/lib/modules/leds-qpnp-vibrator-ldo.ko
 
 on post-fs
-    setprop ro.boot.product.vendor.sku tuna
+    # Mount real ODM partition to hide rootfs symlinks and resolve ELOOP
+    mkdir /odm 0755 root root
+    mount erofs /dev/block/mapper/odm${ro.boot.slot_suffix} /odm ro
+    mount ext4 /dev/block/mapper/odm${ro.boot.slot_suffix} /odm ro
+
+    # Prepare isolated binder library for vendor KeyMint and Gatekeeper HALs
+    mkdir /tmp/keymint_libs 0755 root root
+    symlink /system/lib64/libbinder.so /tmp/keymint_libs/libbinder.so
+
+    # Signal listeners ready for QSEECom
     setprop vendor.sys.listeners.registered true
-    setprop vendor.gatekeeper.is_security_level_spu 0
-    mount none /system/etc/dummy_health.xml /vendor/etc/vintf/manifest/android.hardware.health-service.qti.xml bind
-    wait /dev/block/bootdevice/by-name/odm 2
-    mount erofs /dev/block/bootdevice/by-name/odm /odm ro
+
+    # Start crypto services
+    start qseecomd
     start vendor.keymint-qti
     start vendor.gatekeeper_default
     start vendor.qti.vibrator
@@ -58,30 +66,23 @@ on boot
     wait /sys/class/power_supply/battery/capacity 5
     start health-hal-2-1
 
+service qseecomd /vendor/bin/qseecomd
+    class core
+    user root
+    group root
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/system/lib64
+    seclabel u:r:recovery:s0
+
 service vendor.keymint-qti /vendor/bin/hw/android.hardware.security.keymint-service-qti
     class early_hal
     user root
-    group root drmrpc
-    setenv LD_PRELOAD /system/lib64/libkeymint_compat.so
-    setenv LD_LIBRARY_PATH /vendor/lib64/hw:/vendor/lib64:/system/lib64
-    disabled
+    group root
+    setenv LD_LIBRARY_PATH /tmp/keymint_libs:/vendor/lib64:/vendor/lib64/hw:/system/lib64
     seclabel u:r:recovery:s0
 
 service vendor.gatekeeper_default /vendor/bin/hw/android.hardware.gatekeeper-service-qti
     class early_hal
     user root
     group root
-    setenv LD_PRELOAD /system/lib64/libkeymint_compat.so
-    setenv LD_LIBRARY_PATH /vendor/lib64/hw:/vendor/lib64:/system/lib64
-    disabled
+    setenv LD_LIBRARY_PATH /tmp/keymint_libs:/vendor/lib64:/vendor/lib64/hw:/system/lib64
     seclabel u:r:recovery:s0
-
-service vendor.qti.vibrator /vendor/bin/hw/vendor.qti.hardware.vibrator.service
-    class early_hal
-    user root
-    group root input
-    setenv LD_PRELOAD /system/lib64/libkeymint_compat.so
-    setenv LD_LIBRARY_PATH /vendor/lib64/hw:/vendor/lib64:/system/lib64
-    disabled
-    seclabel u:r:recovery:s0
-

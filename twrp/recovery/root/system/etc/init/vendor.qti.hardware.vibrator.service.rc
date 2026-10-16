@@ -116,6 +116,7 @@ service vendor.qti.vibrator /vendor/bin/hw/vendor.qti.hardware.vibrator.service
     group system input
     setenv RICHTAP_DEVICE_PATH  /dev/aw86927_haptic
     setenv ENV_RICHTAP_CONFIG_PATH /odm/etc/aac_richtap.config
+    seclabel u:r:recovery:s0
 
 #on late-init
 #    write /sys/class/leds/vibrator/trigger "transient"
