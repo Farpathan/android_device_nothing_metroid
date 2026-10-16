@@ -54,15 +54,14 @@ on post-fs
     mkdir /tmp/keymint_libs 0755 root root
     symlink /system/lib64/libbinder.so /tmp/keymint_libs/libbinder.so
 
-    # Required vendor properties for KeyMint and GateKeeper
-    setprop ro.boot.product.vendor.sku sun
+    exec u:r:recovery:s0 -- /sbin/resetprop ro.boot.product.vendor.sku sun
     setprop vendor.gatekeeper.is_security_level_spu 0
     setprop vendor.gatekeeper.disable_spu true
     setprop vendor.sys.listeners.registered true
-    setprop ro.build.version.release 17
-    setprop ro.build.version.security_patch 2026-09-05
-    setprop ro.vendor.build.security_patch 2026-04-05
-    setprop ro.vendor.boot_security_patch 2026-06-05
+    exec u:r:recovery:s0 -- /sbin/resetprop ro.build.version.release 17
+    exec u:r:recovery:s0 -- /sbin/resetprop ro.build.version.security_patch 2026-09-05
+    exec u:r:recovery:s0 -- /sbin/resetprop ro.vendor.build.security_patch 2026-04-05
+    exec u:r:recovery:s0 -- /sbin/resetprop ro.vendor.boot_security_patch 2026-06-05
 
     # Restart servicemanager so it reloads /vendor/etc/vintf/manifest_sun.xml with vendor mounted
     restart servicemanager
