@@ -19,8 +19,8 @@ OrangeFox Recovery device tree for Nothing Phone (3) (codename: Metroid, model: 
 | Feature        | Status               |
 | -------------- | -------------------- |
 | Boot           | ✅ Working           |
-| Touch          | ✅ Working (fts_ts)  |
+| Touch          | ✅ Working |
 | ADB            | ✅ Working           |         
 | Sideload       | ✅ Working           |
-| Backup/Restore | 🔄 In Progress       |     
-| Encryption     | 🔄 In Progress       |
+| Backup/Restore | ✅ Working           |    
+| Encryption     | ✅ Working           |
