@@ -59,9 +59,10 @@ on post-fs
     setprop vendor.gatekeeper.is_security_level_spu 0
     setprop vendor.gatekeeper.disable_spu true
     setprop vendor.sys.listeners.registered true
+    setprop ro.build.version.release 17
+    setprop ro.build.version.security_patch 2026-09-05
     setprop ro.vendor.build.security_patch 2026-04-05
     setprop ro.vendor.boot_security_patch 2026-06-05
-    setprop ro.build.version.security_patch 2026-06-05
 
     # Restart servicemanager so it reloads /vendor/etc/vintf/manifest_sun.xml with vendor mounted
     restart servicemanager
