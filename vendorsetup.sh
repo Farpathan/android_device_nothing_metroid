@@ -92,3 +92,17 @@ export FOX_USE_SED_BINARY=1
 export FOX_USE_XZ_UTILS=1
 export FOX_ENABLE_APP_MANAGER=1
 export FOX_REPLACE_TOOLBOX_GETPROP=1
+
+# Auto-apply essential decryption and haptic patches if needed
+if [ -d "device/nothing/Metroid/patches" ]; then
+    patch -d system/vold -p1 -N -r - --dry-run < device/nothing/Metroid/patches/system_vold.patch >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo "-- Applying system/vold patches for Nothing Phone 3 decryption..."
+        patch -d system/vold -p1 -N -r - < device/nothing/Metroid/patches/system_vold.patch >/dev/null 2>&1
+    fi
+    patch -d bootable/recovery -p1 -N -r - --dry-run < device/nothing/Metroid/patches/bootable_recovery.patch >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo "-- Applying bootable/recovery patches for Nothing Phone 3 crypto & haptics..."
+        patch -d bootable/recovery -p1 -N -r - < device/nothing/Metroid/patches/bootable_recovery.patch >/dev/null 2>&1
+    fi
+fi
