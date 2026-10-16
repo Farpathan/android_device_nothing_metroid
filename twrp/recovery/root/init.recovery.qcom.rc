@@ -37,22 +37,40 @@ on fs
     insmod /vendor/lib/modules/leds-qpnp-vibrator-ldo.ko
 
 on post-fs
-    # Mount real ODM partition to hide rootfs symlinks and resolve ELOOP
+    # Mount dynamic partitions early
+    mkdir /vendor 0755 root root
     mkdir /odm 0755 root root
+    mount erofs /dev/block/mapper/vendor${ro.boot.slot_suffix} /vendor ro
+    mount ext4 /dev/block/mapper/vendor${ro.boot.slot_suffix} /vendor ro
     mount erofs /dev/block/mapper/odm${ro.boot.slot_suffix} /odm ro
     mount ext4 /dev/block/mapper/odm${ro.boot.slot_suffix} /odm ro
+
+    # Mount metadata partition
+    mkdir /metadata 0700 root root
+    mount f2fs /dev/block/bootdevice/by-name/metadata /metadata rw
+    mount ext4 /dev/block/bootdevice/by-name/metadata /metadata rw
 
     # Prepare isolated binder library for vendor KeyMint and Gatekeeper HALs
     mkdir /tmp/keymint_libs 0755 root root
     symlink /system/lib64/libbinder.so /tmp/keymint_libs/libbinder.so
 
-    # Signal listeners ready for QSEECom
+    # Required vendor properties for KeyMint and GateKeeper
+    setprop ro.boot.product.vendor.sku sun
+    setprop vendor.gatekeeper.is_security_level_spu 0
+    setprop vendor.gatekeeper.disable_spu true
     setprop vendor.sys.listeners.registered true
+    setprop ro.vendor.build.security_patch 2026-04-05
+    setprop ro.vendor.boot_security_patch 2026-06-05
+    setprop ro.build.version.security_patch 2026-06-05
+
+    # Restart servicemanager so it reloads /vendor/etc/vintf/manifest_sun.xml with vendor mounted
+    restart servicemanager
 
     # Start crypto services
     start qseecomd
-    start vendor.keymint-qti
     start vendor.gatekeeper_default
+    start vendor.keymint-qti
+    start keystore2
     start vendor.qti.vibrator
 
 on boot
