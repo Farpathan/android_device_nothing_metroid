@@ -1,3 +1,73 @@
+diff --git a/gui/action.cpp b/gui/action.cpp
+index daf579d..df681d3 100755
+--- a/gui/action.cpp
++++ b/gui/action.cpp
+@@ -2441,10 +2441,15 @@ int GUIAction::flashlight(std::string arg __unused)
+ 		while ((de = readdir(d)) != NULL)
+ 		{
+ 			file = de->d_name;
+-			if(file.find("torch") != string::npos || file.find("torch_"))
++			if (file == "." || file == "..")
++				continue;
++			if (file.find("torch") != string::npos)
+ 			{
+-				flashpath = flashp1 + "/" + file + bright;
+-				break;
++				if (TWFunc::Path_Exists(flashp1 + "/" + file + bright))
++				{
++					flashpath = flashp1 + "/" + file + bright;
++					break;
++				}
+ 			}
+ 		}
+ 		closedir (d);
+@@ -2458,6 +2463,18 @@ int GUIAction::flashlight(std::string arg __unused)
+ 		if (DataManager::GetIntValue("pb_torch_on") == 1)
+ 		{
+ 			LOGINFO("Flashlight Turning Off\n");
++			DIR* td = opendir(flashp1.c_str());
++			if (td != NULL) {
++				struct dirent* tde;
++				while ((tde = readdir(td)) != NULL) {
++					string tf = tde->d_name;
++					if (tf.find("switch") != string::npos && TWFunc::Path_Exists(flashp1 + "/" + tf + bright))
++						TWFunc::write_to_file(flashp1 + "/" + tf + bright, "0");
++					if (tf.find("torch") != string::npos && TWFunc::Path_Exists(flashp1 + "/" + tf + bright))
++						TWFunc::write_to_file(flashp1 + "/" + tf + bright, "0");
++				}
++				closedir(td);
++			}
+ 			if (TWFunc::Path_Exists(switch_path))
+ 				TWFunc::write_to_file(switch_path + bright, "0");
+ 			TWFunc::write_to_file(flashpath, "0");
+@@ -2467,9 +2484,26 @@ int GUIAction::flashlight(std::string arg __unused)
+ 		{
+ 			LOGINFO("Flashlight Turning On\n");
+ 			LOGINFO("Flashlight: Brightning value '%d'\n", br_value);
++			DIR* td = opendir(flashp1.c_str());
++			if (td != NULL) {
++				struct dirent* tde;
++				while ((tde = readdir(td)) != NULL) {
++					string tf = tde->d_name;
++					if (tf.find("torch") != string::npos && TWFunc::Path_Exists(flashp1 + "/" + tf + bright))
++						TWFunc::write_to_file(flashp1 + "/" + tf + bright, std::to_string(br_value));
++					if (tf.find("switch") != string::npos && TWFunc::Path_Exists(flashp1 + "/" + tf + bright)) {
++						string msw = "255";
++						if (TWFunc::Path_Exists(flashp1 + "/" + tf + "/max_brightness"))
++							TWFunc::read_file(flashp1 + "/" + tf + "/max_brightness", msw);
++						if (msw.empty() || msw == "0") msw = "255";
++						TWFunc::write_to_file(flashp1 + "/" + tf + bright, msw);
++					}
++				}
++				closedir(td);
++			}
+ 			TWFunc::write_to_file(flashpath, std::to_string(br_value));
+ 			if (TWFunc::Path_Exists(switch_path))
+-				TWFunc::write_to_file(switch_path + bright, "1");
++				TWFunc::write_to_file(switch_path + bright, "255");
+ 			DataManager::SetValue("pb_torch_on", "1");
+ 		}
+ 	} else {
 diff --git a/gui/blanktimer.cpp b/gui/blanktimer.cpp
 index 61356d3..7476703 100644
 --- a/gui/blanktimer.cpp
