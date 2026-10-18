@@ -1,8 +1,8 @@
 diff --git a/gui/blanktimer.cpp b/gui/blanktimer.cpp
-index 1c946ea7..3c7b701b 100755
+index 61356d3..7476703 100644
 --- a/gui/blanktimer.cpp
 +++ b/gui/blanktimer.cpp
-@@ -38,6 +38,7 @@ blanktimer::blanktimer(void) {
+@@ -35,6 +35,7 @@ blanktimer::blanktimer(void) {
  	pthread_mutex_init(&mutex, NULL);
  	setTime(0); // no timeout
  	state = kOn;
@@ -10,7 +10,7 @@ index 1c946ea7..3c7b701b 100755
  	orig_brightness = getBrightness();
  }
  
-@@ -48,6 +49,7 @@ bool blanktimer::isScreenOff() {
+@@ -45,6 +46,7 @@ bool blanktimer::isScreenOff() {
  void blanktimer::setTime(int newtime) {
  	pthread_mutex_lock(&mutex);
  	sleepTimer = newtime;
@@ -18,7 +18,7 @@ index 1c946ea7..3c7b701b 100755
  	pthread_mutex_unlock(&mutex);
  }
  
-@@ -64,7 +66,11 @@ void blanktimer::checkForTimeout() {
+@@ -61,7 +63,11 @@ void blanktimer::checkForTimeout() {
  	if (sleepTimer > 2 && diff.tv_sec > (sleepTimer - 2) && state == kOn) {
  		orig_brightness = getBrightness();
  		state = kDim;
@@ -31,7 +31,7 @@ index 1c946ea7..3c7b701b 100755
  	}
  	if (sleepTimer && diff.tv_sec > sleepTimer && state < kOff) {
  		state = kOff;
-@@ -87,8 +93,11 @@ string blanktimer::getBrightness(void) {
+@@ -84,8 +90,11 @@ string blanktimer::getBrightness(void) {
  
  	if (DataManager::GetIntValue("tw_has_brightnesss_file")) {
  		DataManager::GetValue("tw_brightness", result);
@@ -46,7 +46,7 @@ index 1c946ea7..3c7b701b 100755
  	return result;
  }
 diff --git a/minuitwrp/events.cpp b/minuitwrp/events.cpp
-index e497df62..bdf46a53 100644
+index 47c7ba4..bdf46a5 100644
 --- a/minuitwrp/events.cpp
 +++ b/minuitwrp/events.cpp
 @@ -63,6 +63,8 @@ static std::atomic_int vib_on_count = 0;
@@ -125,15 +125,15 @@ index e497df62..bdf46a53 100644
 -        write_to_file(LEDS_HAPTICS_DURATION_FILE, tout);
 -        write_to_file(LEDS_HAPTICS_ACTIVATE_FILE, "1");
 -    } else
--        write_to_file(VIBRATOR_TIMEOUT_FILE, tout);
+-        write_to_file(VIBRATOR_TIMEOUT_FILE, std::to_string(timeout_ms));
  #endif
      return 0;
  }
 diff --git a/partitionmanager.cpp b/partitionmanager.cpp
-index b52a7d49..b61b4728 100755
+index a311808..5927457 100755
 --- a/partitionmanager.cpp
 +++ b/partitionmanager.cpp
-@@ -678,6 +678,23 @@ void TWPartitionManager::Decrypt_Data() {
+@@ -593,6 +593,23 @@ void TWPartitionManager::Decrypt_Data() {
  		if (Key_Directory_Partition != nullptr)
  			if (!Key_Directory_Partition->Is_Mounted())
  				Mount_By_Path(Decrypt_Data->Key_Directory, false);

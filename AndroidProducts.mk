@@ -15,4 +15,9 @@
 #
 
 PRODUCT_MAKEFILES := \
+    $(LOCAL_DIR)/pb_Metroid.mk \
     $(LOCAL_DIR)/twrp_Metroid.mk
+
+COMMON_LUNCH_CHOICES := \
+    pb_Metroid-eng \
+    pb_Metroid-userdebug
