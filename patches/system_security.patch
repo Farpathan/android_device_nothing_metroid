@@ -1,0 +1,80 @@
+diff --git a/keystore2/src/globals.rs b/keystore2/src/globals.rs
+index 8212213..ea96a4e 100644
+--- a/keystore2/src/globals.rs
++++ b/keystore2/src/globals.rs
+@@ -200,7 +200,8 @@ fn connect_keymint(security_level: &SecurityLevel) -> Result<(Asp, KeyMintHardwa
+             if keymint_instances.as_vec()?.iter().any(|instance| *instance == "strongbox") {
+                 Some(format!("{}/strongbox", KEYMINT_SERVICE_NAME))
+             } else {
+-                None
++                return Err(Error::Km(ErrorCode::HARDWARE_TYPE_UNAVAILABLE))
++                    .context("In connect_keymint: Strongbox not present.");
+             }
+         }
+         _ => {
+diff --git a/keystore2/src/km_compat/km_compat.cpp b/keystore2/src/km_compat/km_compat.cpp
+index 2c565c6..25500c8 100644
+--- a/keystore2/src/km_compat/km_compat.cpp
++++ b/keystore2/src/km_compat/km_compat.cpp
+@@ -1307,11 +1307,8 @@ KeymasterDevices enumerateKeymasterDevices(IServiceManager* serviceManager) {
+     serviceManager->listManifestByInterface(
+         Wrapper::WrappedIKeymasterDevice::descriptor, [&](const hidl_vec<hidl_string>& names) {
+             auto try_get_device = [&](const auto& name, bool fail_silent) {
+-                auto device = Wrapper::WrappedIKeymasterDevice::getService(name);
+-                if (fail_silent && !device) return;
+-                CHECK(device) << "Failed to get service for \""
+-                              << Wrapper::WrappedIKeymasterDevice::descriptor
+-                              << "\" with interface name \"" << name << "\"";
++                auto device = Wrapper::WrappedIKeymasterDevice::tryGetService(name);
++                if (!device) return;
+ 
+                 sp<Keymaster> kmDevice(new Wrapper(device, name));
+                 auto halVersion = kmDevice->halVersion();
+diff --git a/keystore2/src/vintf/vintf.cpp b/keystore2/src/vintf/vintf.cpp
+index e407efa..c6289f3 100644
+--- a/keystore2/src/vintf/vintf.cpp
++++ b/keystore2/src/vintf/vintf.cpp
+@@ -31,6 +31,10 @@ static char** convert(const std::set<std::string>& names) {
+ 
+ char** getHalNames(size_t* len) {
+     auto manifest = android::vintf::VintfObject::GetDeviceHalManifest();
++    if (!manifest) {
++        *len = 0;
++        return nullptr;
++    }
+     const auto names = manifest->getHalNames();
+     *len = names.size();
+     return convert(names);
+@@ -38,6 +42,10 @@ char** getHalNames(size_t* len) {
+ 
+ char** getHalNamesAndVersions(size_t* len) {
+     auto manifest = android::vintf::VintfObject::GetDeviceHalManifest();
++    if (!manifest) {
++        *len = 0;
++        return nullptr;
++    }
+     const auto names = manifest->getHalNamesAndVersions();
+     *len = names.size();
+     return convert(names);
+@@ -47,6 +55,10 @@ char** getHidlInstances(size_t* len, const char* package, size_t major_version,
+                         size_t minor_version, const char* interfaceName) {
+     android::vintf::Version version(major_version, minor_version);
+     auto manifest = android::vintf::VintfObject::GetDeviceHalManifest();
++    if (!manifest) {
++        *len = 0;
++        return nullptr;
++    }
+     const auto names = manifest->getHidlInstances(package, version, interfaceName);
+     *len = names.size();
+     return convert(names);
+@@ -55,6 +67,10 @@ char** getHidlInstances(size_t* len, const char* package, size_t major_version,
+ char** getAidlInstances(size_t* len, const char* package, size_t version,
+                         const char* interfaceName) {
+     auto manifest = android::vintf::VintfObject::GetDeviceHalManifest();
++    if (!manifest) {
++        *len = 0;
++        return nullptr;
++    }
+     const auto names = manifest->getAidlInstances(package, version, interfaceName);
+     *len = names.size();
+     return convert(names);

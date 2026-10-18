@@ -1,0 +1,72 @@
+diff --git a/VintfObject.cpp b/VintfObject.cpp
+index 0a2b49c..b1c9a00 100644
+--- a/VintfObject.cpp
++++ b/VintfObject.cpp
+@@ -221,14 +221,17 @@ status_t VintfObject::addDirectoryManifests(const std::string& directory, HalMan
+         // Only adds HALs because all other things are added by libvintf
+         // itself for now.
+         HalManifest fragmentManifest;
+-        err = fetchOneHalManifest(directory + file, &fragmentManifest, error);
+-        if (err != OK) return err;
++        std::string fetchErr;
++        err = fetchOneHalManifest(directory + file, &fragmentManifest, &fetchErr);
++        if (err != OK) {
++            LOG(WARNING) << "Ignoring unparseable manifest fragment " << directory + file << ": " << fetchErr;
++            continue;
++        }
+ 
+-        if (!manifest->addAll(&fragmentManifest, error)) {
+-            if (error) {
+-                error->insert(0, "Cannot add manifest fragment " + directory + file + ": ");
+-            }
+-            return UNKNOWN_ERROR;
++        std::string addErr;
++        if (!manifest->addAll(&fragmentManifest, &addErr)) {
++            LOG(WARNING) << "Cannot add manifest fragment " << directory + file << ": " << addErr;
++            continue;
+         }
+     }
+ 
+diff --git a/include/vintf/constants.h b/include/vintf/constants.h
+index 6c56451..8d43c95 100644
+--- a/include/vintf/constants.h
++++ b/include/vintf/constants.h
+@@ -23,7 +23,7 @@ namespace android {
+ namespace vintf {
+ 
+ /* libvintf meta-version */
+-constexpr Version kMetaVersion{4, 0};
++constexpr Version kMetaVersion{99, 0};
+ 
+ // Default version for an AIDL HAL if no version is specified.
+ constexpr size_t kDefaultAidlMinorVersion = 1;
+diff --git a/parse_xml.cpp b/parse_xml.cpp
+index 6e0538c..b7eeecc 100644
+--- a/parse_xml.cpp
++++ b/parse_xml.cpp
+@@ -808,8 +808,9 @@ struct ManifestHalConverter : public XmlNodeConverter<ManifestHal> {
+ #endif
+ 
+         std::set<FqInstance> fqInstances;
+-        if (!parseChildren(root, FqInstanceConverter{}, &fqInstances, error)) {
+-            return false;
++        std::string fqErr;
++        if (!parseChildren(root, FqInstanceConverter{}, &fqInstances, &fqErr)) {
++            fqInstances.clear();
+         }
+         std::set<FqInstance> fqInstancesToInsert;
+         for (auto& e : fqInstances) {
+@@ -955,7 +956,12 @@ struct HalManifestSepolicyConverter : public XmlNodeConverter<Version> {
+         appendChild(root, VersionConverter{}(m, d));
+     }
+     bool buildObject(Version* object, NodeType* root, std::string* error) const override {
+-        return parseChild(root, VersionConverter{}, object, error);
++        (void)error;
++        std::string err;
++        if (!parseChild(root, VersionConverter{}, object, &err)) {
++            *object = Version{0, 0};
++        }
++        return true;
+     }
+ };
+ 
