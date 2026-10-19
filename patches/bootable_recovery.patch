@@ -157,3 +157,17 @@ index b52a7d49..b61b4728 100755
  		if (!Decrypt_Data->Key_Directory.empty()) {
  			Set_Crypto_Type("file");
  #ifdef TW_INCLUDE_FBE_METADATA_DECRYPT
+diff --git a/startupArgs.cpp b/startupArgs.cpp
+index 058bc404..101167fc 100755
+--- a/startupArgs.cpp
++++ b/startupArgs.cpp
+@@ -48,9 +48,6 @@ bool startupArgs::processRecoveryArgs(std::vector<std::string> args, int index)
+ 		if (args[index] == FASTBOOT) {
+ 			fastboot_mode = true;
+ 			android::base::SetProperty("sys.usb.config", "none");
+-			android::base::SetProperty("sys.usb.configfs", "0");
+-			sleep(1);
+-			android::base::SetProperty("sys.usb.configfs", "1");
+ 			android::base::SetProperty("sys.usb.config", "fastboot");
+ 			DataManager::SetValue("tw_enable_adb", 0);
+ 			DataManager::SetValue("tw_enable_fastboot", 1);
