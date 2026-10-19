@@ -1,170 +1,73 @@
-diff --git a/gui/blanktimer.cpp b/gui/blanktimer.cpp
-index 1c946ea7..3c7b701b 100755
---- a/gui/blanktimer.cpp
-+++ b/gui/blanktimer.cpp
-@@ -38,6 +38,7 @@ blanktimer::blanktimer(void) {
- 	pthread_mutex_init(&mutex, NULL);
- 	setTime(0); // no timeout
- 	state = kOn;
-+	setTimer();
- 	orig_brightness = getBrightness();
- }
+diff --git a/Android.mk b/Android.mk
+index d35090d9..7e53bc95 100755
+--- a/Android.mk
++++ b/Android.mk
+@@ -160,9 +160,11 @@ endif
  
-@@ -48,6 +49,7 @@ bool blanktimer::isScreenOff() {
- void blanktimer::setTime(int newtime) {
- 	pthread_mutex_lock(&mutex);
- 	sleepTimer = newtime;
-+	setTimer();
- 	pthread_mutex_unlock(&mutex);
- }
+ ifeq ($(AB_OTA_UPDATER),true)
+     LOCAL_CFLAGS += -DAB_OTA_UPDATER=1
+-    TWRP_REQUIRED_MODULES += libhardware android.hardware.boot@1.0-service android.hardware.boot@1.0-service.rc \
+-    android.hardware.boot@1.1-service android.hardware.boot@1.1-service.rc android.hardware.boot@1.1.xml \
+-    android.hardware.boot@1.2-service android.hardware.boot@1.2-service.rc android.hardware.boot@1.2.xml
++    ifneq ($(TW_NO_LEGACY_BOOT_HAL),true)
++        TWRP_REQUIRED_MODULES += libhardware android.hardware.boot@1.0-service android.hardware.boot@1.0-service.rc \
++        android.hardware.boot@1.1-service android.hardware.boot@1.1-service.rc android.hardware.boot@1.1.xml \
++        android.hardware.boot@1.2-service android.hardware.boot@1.2-service.rc android.hardware.boot@1.2.xml
++    endif
+ endif
  
-@@ -64,7 +66,11 @@ void blanktimer::checkForTimeout() {
- 	if (sleepTimer > 2 && diff.tv_sec > (sleepTimer - 2) && state == kOn) {
- 		orig_brightness = getBrightness();
- 		state = kDim;
--		TWFunc::Set_Brightness("5");
-+		int max = DataManager::GetIntValue("tw_brightness_max");
-+		if (max <= 0) max = 255;
-+		int dim_val = max / 20;
-+		if (dim_val < 5) dim_val = 5;
-+		TWFunc::Set_Brightness(std::to_string(dim_val));
- 	}
- 	if (sleepTimer && diff.tv_sec > sleepTimer && state < kOff) {
- 		state = kOff;
-@@ -87,8 +93,11 @@ string blanktimer::getBrightness(void) {
+ ifeq ($(PRODUCT_USE_DYNAMIC_PARTITIONS),true)
+diff --git a/etc/init.rc b/etc/init.rc
+index 5c13ef74..6259b3fe 100644
+--- a/etc/init.rc
++++ b/etc/init.rc
+@@ -182,32 +182,8 @@ on property:sys.usb.config=fastboot && property:sys.usb.configfs=0
+     write /sys/class/android_usb/android0/enable 1
+     setprop sys.usb.state ${sys.usb.config}
  
- 	if (DataManager::GetIntValue("tw_has_brightnesss_file")) {
- 		DataManager::GetValue("tw_brightness", result);
--		if (result.empty())
--			result = "255";
-+		if (result.empty() || result == "0") {
-+			result = DataManager::GetStrValue("tw_brightness_max");
-+			if (result.empty() || result == "0")
-+				result = "2048";
-+		}
- 	}
- 	return result;
- }
-diff --git a/minuitwrp/events.cpp b/minuitwrp/events.cpp
-index e497df62..bdf46a53 100644
---- a/minuitwrp/events.cpp
-+++ b/minuitwrp/events.cpp
-@@ -63,6 +63,8 @@ static std::atomic_int vib_on_count = 0;
- 
- #define LEDS_HAPTICS_DURATION_FILE	"/sys/class/leds/vibrator/duration"
- #define LEDS_HAPTICS_ACTIVATE_FILE	"/sys/class/leds/vibrator/activate"
-+#define LEDS_HAPTICS_NT_DURATION_FILE	"/sys/class/leds/vibrator_nt/duration"
-+#define LEDS_HAPTICS_NT_ACTIVATE_FILE	"/sys/class/leds/vibrator_nt/activate"
- 
- #ifndef SYN_REPORT
- #define SYN_REPORT          0x00
-@@ -149,44 +151,41 @@ int write_to_file(const std::string& fn, const std::string& line) {
- #ifndef TW_HAPTICS_TSPDRV
- int vibrate(int timeout_ms)
- {
--    if (timeout_ms > 10000) timeout_ms = 1000;
--    char tout[6];
--    sprintf(tout, "%i", timeout_ms);
-+    if (timeout_ms <= 0) return 0;
-+    if (timeout_ms > 1000) timeout_ms = 1000;
-+    char tout[16];
-+    snprintf(tout, sizeof(tout), "%d\n", timeout_ms);
-+
-+    static int s_nt_vibrator = -1;
-+    if (s_nt_vibrator == -1) {
-+        s_nt_vibrator = (access(LEDS_HAPTICS_NT_ACTIVATE_FILE, F_OK) == 0) ? 1 : 0;
-+    }
-+    if (s_nt_vibrator == 1) {
-+        write_to_file(LEDS_HAPTICS_NT_DURATION_FILE, tout);
-+        write_to_file(LEDS_HAPTICS_NT_ACTIVATE_FILE, "1\n");
-+        return 0;
-+    }
-+
-+    if (access(LEDS_HAPTICS_ACTIVATE_FILE, F_OK) == 0) {
-+        write_to_file(LEDS_HAPTICS_DURATION_FILE, tout);
-+        write_to_file(LEDS_HAPTICS_ACTIVATE_FILE, "1\n");
-+        return 0;
-+    }
-+
-+    if (access(VIBRATOR_TIMEOUT_FILE, F_OK) == 0) {
-+        write_to_file(VIBRATOR_TIMEOUT_FILE, tout);
-+        return 0;
-+    }
- 
- #ifdef USE_QTI_HAPTICS
-     android::sp<android::hardware::vibrator::V1_2::IVibrator> vib = android::hardware::vibrator::V1_2::IVibrator::getService();
-     if (vib != nullptr) {
-         vib->on((uint32_t)timeout_ms);
-     }
--#elif defined(USE_QTI_AIDL_HAPTICS)
--    std::shared_ptr<IVibrator> vib = IVibrator::fromBinder(ndk::SpAIBinder(AServiceManager_getService(kVibratorInstance.c_str())));
--    if (vib != nullptr) {
--#ifdef USE_QTI_AIDL_HAPTICS_FIX_OFF
--        std::thread([vib, timeout_ms] {
--            if (vib->on((uint32_t)timeout_ms, nullptr).isOk()) {
--                vib_on_count++;
--                usleep(timeout_ms * 1000);
--                vib_on_count--;
--                if (!vib_on_count) vib->off();
--            }
--        }).detach();
--#else
--        vib->on((uint32_t)timeout_ms, nullptr);
--#endif
--    }
- #elif defined(USE_SAMSUNG_HAPTICS)
--    /* Newer Samsung devices have duration file only
--     0 in VIBRATOR_TIMEOUT_FILE means no vibration
--     Anything else is the vibration running for X milliseconds */
--    if (std::ifstream(VIBRATOR_TIMEOUT_FILE).good()) {
-+    if (access(VIBRATOR_TIMEOUT_FILE, F_OK) == 0) {
-         write_to_file(VIBRATOR_TIMEOUT_FILE, tout);
-     }
--#else
--    if (std::ifstream(LEDS_HAPTICS_ACTIVATE_FILE).good()) {
--        write_to_file(LEDS_HAPTICS_DURATION_FILE, tout);
--        write_to_file(LEDS_HAPTICS_ACTIVATE_FILE, "1");
--    } else
--        write_to_file(VIBRATOR_TIMEOUT_FILE, tout);
- #endif
-     return 0;
- }
-diff --git a/partitionmanager.cpp b/partitionmanager.cpp
-index b52a7d49..b61b4728 100755
---- a/partitionmanager.cpp
-+++ b/partitionmanager.cpp
-@@ -678,6 +678,23 @@ void TWPartitionManager::Decrypt_Data() {
- 		if (Key_Directory_Partition != nullptr)
- 			if (!Key_Directory_Partition->Is_Mounted())
- 				Mount_By_Path(Decrypt_Data->Key_Directory, false);
-+
-+		// Ensure vendor and odm partitions are mounted for KeyMint and Gatekeeper HALs
-+		TWPartition* Ven_Partition = Find_Partition_By_Path("/vendor");
-+		if (Ven_Partition != nullptr && !Ven_Partition->Is_Mounted())
-+			Ven_Partition->Mount(false);
-+		TWPartition* Odm_Partition = Find_Partition_By_Path("/odm");
-+		if (Odm_Partition != nullptr && !Odm_Partition->Is_Mounted())
-+			Odm_Partition->Mount(false);
-+
-+		property_set("orangefox.mount_to_decrypt", "1");
-+		property_set("ctl.restart", "servicemanager");
-+		property_set("ctl.start", "qseecomd");
-+		property_set("ctl.start", "vendor.gatekeeper_default");
-+		property_set("ctl.start", "vendor.keymint-qti");
-+		property_set("ctl.start", "keystore2");
-+		usleep(200000);
-+
- 		if (!Decrypt_Data->Key_Directory.empty()) {
- 			Set_Crypto_Type("file");
- #ifdef TW_INCLUDE_FBE_METADATA_DECRYPT
+-# Configfs triggers
+-on property:sys.usb.config=none && property:sys.usb.configfs=1
+-    write /config/usb_gadget/g1/UDC "none"
+-    stop adbd
+-    stop fastbootd
+-    setprop sys.usb.ffs.ready 0
+-    rm /config/usb_gadget/g1/configs/b.1/f1
+-    setprop sys.usb.state ${sys.usb.config}
+-
+-on property:sys.usb.config=sideload && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
+-    write /config/usb_gadget/g1/idProduct 0xD001
+-    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "adb"
+-    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f1
+-    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+-    setprop sys.usb.state ${sys.usb.config}
+-
+-on property:sys.usb.config=adb && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
+-    write /config/usb_gadget/g1/idProduct 0xD001
+-    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "adb"
+-    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f1
+-    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+-    setprop sys.usb.state ${sys.usb.config}
+-
+-on property:sys.usb.config=fastboot && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
+-    write /config/usb_gadget/g1/idProduct 0x4EE0
+-    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "fastboot"
+-    symlink /config/usb_gadget/g1/functions/ffs.fastboot /config/usb_gadget/g1/configs/b.1/f1
+-    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+-    setprop sys.usb.state ${sys.usb.config}
++# Generic configfs triggers handled by device init.recovery.usb.rc
++# on property:sys.usb.config=none && property:sys.usb.configfs=1
++# on property:sys.usb.config=sideload && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
++# on property:sys.usb.config=adb && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
++# on property:sys.usb.config=fastboot && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
 diff --git a/startupArgs.cpp b/startupArgs.cpp
-index 058bc404..101167fc 100755
+index 058bc404..86c395e0 100755
 --- a/startupArgs.cpp
 +++ b/startupArgs.cpp
-@@ -48,9 +48,6 @@ bool startupArgs::processRecoveryArgs(std::vector<std::string> args, int index)
+@@ -47,10 +47,6 @@ bool startupArgs::processRecoveryArgs(std::vector<std::string> args, int index)
+ 		printf("'%s'", args[index].c_str());
  		if (args[index] == FASTBOOT) {
  			fastboot_mode = true;
- 			android::base::SetProperty("sys.usb.config", "none");
+-			android::base::SetProperty("sys.usb.config", "none");
 -			android::base::SetProperty("sys.usb.configfs", "0");
 -			sleep(1);
 -			android::base::SetProperty("sys.usb.configfs", "1");

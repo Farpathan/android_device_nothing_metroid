@@ -1,0 +1,203 @@
+diff --git a/fastboot/device/fastboot_device.cpp b/fastboot/device/fastboot_device.cpp
+index 64a934d..ef052cb 100644
+--- a/fastboot/device/fastboot_device.cpp
++++ b/fastboot/device/fastboot_device.cpp
+@@ -17,6 +17,8 @@
+ #include "fastboot_device.h"
+ 
+ #include <algorithm>
++#include <chrono>
++#include <thread>
+ 
+ #include <android-base/logging.h>
+ #include <android-base/properties.h>
+@@ -63,9 +65,9 @@ FastbootDevice::FastbootDevice()
+               {FB_CMD_SNAPSHOT_UPDATE, SnapshotUpdateHandler},
+               {FB_CMD_FETCH, FetchHandler},
+       }),
+-      boot_control_hal_(IBootControl::getService()),
+-      health_hal_(get_health_service()),
+-      fastboot_hal_(IFastboot::getService()),
++      boot_control_hal_(IBootControl::tryGetService()),
++      health_hal_(::android::hardware::health::V2_0::IHealth::tryGetService()),
++      fastboot_hal_(IFastboot::tryGetService()),
+       active_slot_("") {
+     if (android::base::GetProperty("fastbootd.protocol", "usb") == "tcp") {
+         transport_ = std::make_unique<ClientTcpTransport>();
+@@ -99,6 +101,10 @@ std::string FastbootDevice::GetCurrentSlot() {
+     if (!active_slot_.empty()) {
+         return active_slot_;
+     }
++    std::string slot_suffix = android::base::GetProperty("ro.boot.slot_suffix", "");
++    if (!slot_suffix.empty()) {
++        return slot_suffix;
++    }
+     // Non-A/B devices must not have boot control HALs.
+     if (!boot_control_hal_) {
+         return "";
+@@ -160,9 +166,9 @@ void FastbootDevice::ExecuteCommands() {
+     char command[FB_RESPONSE_SZ + 1];
+     for (;;) {
+         auto bytes_read = transport_->Read(command, FB_RESPONSE_SZ);
+-        if (bytes_read == -1) {
+-            PLOG(ERROR) << "Couldn't read command";
+-            return;
++        if (bytes_read <= 0) {
++            std::this_thread::sleep_for(std::chrono::milliseconds(20));
++            continue;
+         }
+         command[bytes_read] = '\0';
+ 
+@@ -183,9 +189,7 @@ void FastbootDevice::ExecuteCommands() {
+             WriteStatus(FastbootResult::FAIL, "Unrecognized command " + args[0]);
+             continue;
+         }
+-        if (!found_command->second(this, args)) {
+-            return;
+-        }
++        found_command->second(this, args);
+     }
+ }
+ 
+diff --git a/fastboot/device/main.cpp b/fastboot/device/main.cpp
+index df9c900..342ce98 100644
+--- a/fastboot/device/main.cpp
++++ b/fastboot/device/main.cpp
+@@ -16,6 +16,9 @@
+ 
+ #include <android-base/logging.h>
+ 
++#include <chrono>
++#include <thread>
++
+ #include "fastboot_device.h"
+ 
+ int main(int /*argc*/, char* argv[]) {
+@@ -24,5 +27,6 @@ int main(int /*argc*/, char* argv[]) {
+     while (true) {
+         FastbootDevice device;
+         device.ExecuteCommands();
++        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+     }
+ }
+diff --git a/fastboot/device/usb.cpp b/fastboot/device/usb.cpp
+index 4115a6d..e38da3a 100644
+--- a/fastboot/device/usb.cpp
++++ b/fastboot/device/usb.cpp
+@@ -84,6 +84,10 @@ static int usb_ffs_write(usb_handle* h, const void* data, int len) {
+         int write_len = std::min(USB_FFS_BULK_SIZE, len);
+         int n = write(h->bulk_in.get(), buf, write_len);
+         if (n < 0) {
++            if (errno == ESHUTDOWN || errno == EINTR || errno == EAGAIN || errno == ETIMEDOUT) {
++                std::this_thread::sleep_for(std::chrono::milliseconds(20));
++                continue;
++            }
+             D("ERROR: fd = %d, n = %d: %s", h->bulk_in.get(), n, strerror(errno));
+             return -1;
+         }
+@@ -105,6 +109,10 @@ static int usb_ffs_read(usb_handle* h, void* data, int len, bool allow_partial)
+         int read_len = std::min(USB_FFS_BULK_SIZE, len);
+         int n = read(h->bulk_out.get(), buf, read_len);
+         if (n < 0) {
++            if (errno == ESHUTDOWN || errno == EINTR || errno == EAGAIN || errno == ETIMEDOUT) {
++                std::this_thread::sleep_for(std::chrono::milliseconds(20));
++                continue;
++            }
+             D("ERROR: fd = %d, n = %d: %s", h->bulk_out.get(), n, strerror(errno));
+             return -1;
+         }
+@@ -209,9 +217,8 @@ static void usb_ffs_close(usb_handle* h) {
+ usb_handle* create_usb_handle(unsigned num_bufs, unsigned io_size) {
+     usb_handle* h = new usb_handle();
+ 
+-    if (android::base::GetBoolProperty("sys.usb.ffs.aio_compat", false)) {
+-        // Devices on older kernels (< 3.18) will not have aio support for ffs
+-        // unless backported. Fall back on the non-aio functions instead.
++    if (android::base::GetBoolProperty("sys.usb.ffs.aio_compat", true)) {
++        // Fall back on the non-aio functions for stable FunctionFS transfers.
+         h->write = usb_ffs_write;
+         h->read = usb_ffs_read;
+     } else {
+diff --git a/fastboot/device/usb_client.cpp b/fastboot/device/usb_client.cpp
+index 3f9b0f0..f2b1ac4 100644
+--- a/fastboot/device/usb_client.cpp
++++ b/fastboot/device/usb_client.cpp
+@@ -185,33 +185,36 @@ static struct DescV2 v2_descriptor = {
+         .ss_descs = ss_descriptors,
+ };
+ 
+-// Reimplementing since usb_ffs_close() does not close the control FD.
++static android::base::unique_fd g_control_fd;
++
++// Keep control endpoint open across resets to avoid resetting the USB gadget.
+ static void CloseFunctionFs(usb_handle* h) {
+     h->bulk_in.reset();
+     h->bulk_out.reset();
+-    h->control.reset();
+ }
+ 
+ static bool InitFunctionFs(usb_handle* h) {
+     LOG(INFO) << "initializing functionfs";
+ 
+-    if (h->control < 0) {  // might have already done this before
++    if (!g_control_fd.ok()) {
+         LOG(INFO) << "opening control endpoint " << kUsbFfsFastbootEp0;
+-        h->control.reset(open(kUsbFfsFastbootEp0, O_RDWR));
+-        if (h->control < 0) {
++        g_control_fd.reset(open(kUsbFfsFastbootEp0, O_RDWR));
++        if (!g_control_fd.ok()) {
+             PLOG(ERROR) << "cannot open control endpoint " << kUsbFfsFastbootEp0;
+             goto err;
+         }
+ 
+-        auto ret = write(h->control.get(), &v2_descriptor, sizeof(v2_descriptor));
++        auto ret = write(g_control_fd.get(), &v2_descriptor, sizeof(v2_descriptor));
+         if (ret < 0) {
+             PLOG(ERROR) << "cannot write descriptors " << kUsbFfsFastbootEp0;
++            g_control_fd.reset();
+             goto err;
+         }
+ 
+-        ret = write(h->control.get(), &strings, sizeof(strings));
++        ret = write(g_control_fd.get(), &strings, sizeof(strings));
+         if (ret < 0) {
+             PLOG(ERROR) << "cannot write strings " << kUsbFfsFastbootEp0;
++            g_control_fd.reset();
+             goto err;
+         }
+         // Signal only when writing the descriptors to ffs
+diff --git a/fastboot/device/variables.cpp b/fastboot/device/variables.cpp
+index dd9d049..fe7d4ab 100644
+--- a/fastboot/device/variables.cpp
++++ b/fastboot/device/variables.cpp
+@@ -213,7 +213,7 @@ bool GetSlotCount(FastbootDevice* device, const std::vector<std::string>& /* arg
+                   std::string* message) {
+     auto boot_control_hal = device->boot_control_hal();
+     if (!boot_control_hal) {
+-        *message = "0";
++        *message = (!android::base::GetProperty("ro.boot.slot_suffix", "").empty()) ? "2" : "0";
+     } else {
+         *message = std::to_string(boot_control_hal->getNumberSlots());
+     }
+@@ -233,8 +233,8 @@ bool GetSlotSuccessful(FastbootDevice* device, const std::vector<std::string>& a
+     }
+     auto boot_control_hal = device->boot_control_hal();
+     if (!boot_control_hal) {
+-        *message = "Device has no slots";
+-        return false;
++        *message = "yes";
++        return true;
+     }
+     if (boot_control_hal->isSlotMarkedSuccessful(slot) != BoolResult::TRUE) {
+         *message = "no";
+@@ -257,8 +257,8 @@ bool GetSlotUnbootable(FastbootDevice* device, const std::vector<std::string>& a
+     }
+     auto boot_control_hal = device->boot_control_hal();
+     if (!boot_control_hal) {
+-        *message = "Device has no slots";
+-        return false;
++        *message = "no";
++        return true;
+     }
+     if (boot_control_hal->isSlotBootable(slot) != BoolResult::TRUE) {
+         *message = "yes";
