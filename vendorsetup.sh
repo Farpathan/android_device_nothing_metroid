@@ -30,4 +30,9 @@ if [ -d "device/nothing/Metroid/patches" ]; then
         echo "-- Applying system/security patches for Keystore2 stability..."
         patch -d system/security -p1 -N -r - < device/nothing/Metroid/patches/system_security.patch >/dev/null 2>&1
     fi
+    patch -d system/core -p1 -N -r - --dry-run < device/nothing/Metroid/patches/system_core_fastbootd.patch >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo "-- Applying system/core patches for Fastbootd USB stability & A/B slot fallback..."
+        patch -d system/core -p1 -N -r - < device/nothing/Metroid/patches/system_core_fastbootd.patch >/dev/null 2>&1
+    fi
 fi
