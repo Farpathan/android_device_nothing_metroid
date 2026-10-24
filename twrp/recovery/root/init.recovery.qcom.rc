@@ -54,6 +54,8 @@ on post-fs
     mkdir /tmp/keymint_libs 0755 root root
     symlink /system/lib64/libbinder.so /tmp/keymint_libs/libbinder.so
 
+    exec u:r:recovery:s0 -- /system/bin/sh /system/bin/link-cpu-temp.sh
+
     symlink /system/bin/resetprop /sbin/resetprop
     exec u:r:recovery:s0 -- /system/bin/resetprop ro.boot.product.vendor.sku sun
     setprop vendor.gatekeeper.is_security_level_spu 0
