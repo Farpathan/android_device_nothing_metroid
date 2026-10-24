@@ -260,8 +260,31 @@ index 47c7ba4..bdf46a5 100644
  #endif
      return 0;
  }
+diff --git a/partition.cpp b/partition.cpp
+index 84a027d..e615808 100755
+--- a/partition.cpp
++++ b/partition.cpp
+@@ -1758,6 +1758,18 @@ bool TWPartition::UnMount(bool Display_Error, int flags) {
+ 		if (!Symlink_Mount_Point.empty())
+ 			umount2(Symlink_Mount_Point.c_str(), flags);
+ 
++		// The crypto daemons started by init.recovery.qcom.rc run from /vendor and keep it busy
++		if (Mount_Point == "/vendor") {
++			for (const char* svc : {"vendor.keymint-qti", "vendor.gatekeeper_default", "qseecomd"}) {
++				std::string state = android::base::GetProperty(std::string("init.svc.") + svc, "");
++				if (state.empty() || state == "stopped")
++					continue;
++				LOGINFO("Stopping %s to release /vendor\n", svc);
++				property_set("ctl.stop", svc);
++				android::base::WaitForProperty(std::string("init.svc.") + svc, "stopped", std::chrono::seconds(3));
++			}
++		}
++
+ 		umount2(Mount_Point.c_str(), flags);
+ 		if (Is_Mounted()) {
+ 			if (Display_Error)
 diff --git a/partitionmanager.cpp b/partitionmanager.cpp
-index a311808..5927457 100755
+index a311808..e35e572 100755
 --- a/partitionmanager.cpp
 +++ b/partitionmanager.cpp
 @@ -593,6 +593,23 @@ void TWPartitionManager::Decrypt_Data() {
@@ -288,6 +311,36 @@ index a311808..5927457 100755
  		if (!Decrypt_Data->Key_Directory.empty()) {
  			Set_Crypto_Type("file");
  #ifdef TW_INCLUDE_FBE_METADATA_DECRYPT
+@@ -4412,6 +4429,29 @@ bool TWPartitionManager::Check_Pending_Merges() {
+ 		return false;
+ 	}
+ 
++	// libsnapshot maps every partition in the slot metadata, so inactive slot mappings must go too
++	if (DataManager::GetStrValue("tw_has_boot_slots") == "1") {
++		std::string inactive_suffix = Get_Active_Slot_Suffix() == "_a" ? "_b" : "_a";
++		std::vector<std::string> stale;
++		DIR* d = opendir("/dev/block/mapper");
++		if (d != NULL) {
++			struct dirent* de;
++			while ((de = readdir(d)) != NULL) {
++				std::string name = de->d_name;
++				if (de->d_type == DT_DIR || name == "control")
++					continue;
++				if (android::base::EndsWith(name, inactive_suffix) || android::base::EndsWith(name, inactive_suffix + "-cow"))
++					stale.push_back(name);
++			}
++			closedir(d);
++		}
++		for (const auto& name : stale) {
++			LOGINFO("removing inactive slot partition: %s\n", name.c_str());
++			if (!DestroyLogicalPartition(name))
++				LOGINFO("Unable to remove %s\n", name.c_str());
++		}
++	}
++
+ 	auto callback = [&]() -> void {
+ 		double progress;
+ 		sm->GetUpdateState(&progress);
 diff --git a/startupArgs.cpp b/startupArgs.cpp
 index 954f3f5..9d95f98 100755
 --- a/startupArgs.cpp
