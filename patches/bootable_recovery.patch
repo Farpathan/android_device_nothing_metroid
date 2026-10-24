@@ -260,6 +260,34 @@ index 47c7ba4..bdf46a5 100644
  #endif
      return 0;
  }
+diff --git a/openrecoveryscript.cpp b/openrecoveryscript.cpp
+index 56cb895..50774a5 100755
+--- a/openrecoveryscript.cpp
++++ b/openrecoveryscript.cpp
+@@ -380,22 +380,17 @@ int OpenRecoveryScript::run_script_file(void) {
+ 				DataManager::SetValue("tw_action_text2", gui_parse_text("{@sideload}"));
+ 				install_cmd = -1;
+ 
+-				int wipe_cache = 0;
+ 				string result;
+ 
+ 				gui_msg("start_sideload=Starting ADB sideload feature...");
+ 
+ 				Device::BuiltinAction reboot_action = Device::REBOOT_BOOTLOADER;
++				// twrp_sideload() installs the package itself and closes the FUSE file afterwards
+ 				ret_val = twrp_sideload("/", &reboot_action);
+ 				if (ret_val != 0) {
+ 					if (ret_val == -2)
+ 						gui_err("need_new_adb=You need adb 1.0.32 or newer to sideload to this device.");
+ 					ret_val = 1; // failure
+-				} else if (TWinstall_zip(FUSE_SIDELOAD_HOST_PATHNAME, &wipe_cache) == 0) {
+-					if (wipe_cache)
+-						PartitionManager.Wipe_By_Path("/cache");
+-				} else {
+-					ret_val = 1; // failure
+ 				}
+ 				PartitionManager.Unlock_Block_Partitions();
+ 				PartitionManager.Update_System_Details();
 diff --git a/partition.cpp b/partition.cpp
 index 84a027d..e615808 100755
 --- a/partition.cpp
@@ -356,3 +384,27 @@ index 954f3f5..9d95f98 100755
  			android::base::SetProperty("sys.usb.config", "fastboot");
  			DataManager::SetValue("tw_enable_adb", 0);
  			DataManager::SetValue("tw_enable_fastboot", 1);
+diff --git a/twrpinstall/adb_install.cpp b/twrpinstall/adb_install.cpp
+index 5486b7e..59ac8cd 100755
+--- a/twrpinstall/adb_install.cpp
++++ b/twrpinstall/adb_install.cpp
+@@ -278,7 +278,9 @@ static void ListenAndExecuteMinadbdCommands(
+ static void CreateMinadbdServiceAndExecuteCommands(
+     const std::map<MinadbdCommand, CommandFunction>& command_map,
+     bool rescue_mode __unused, std::string install_file __unused) {
+-  signal(SIGPIPE, SIG_IGN);
++  // Restore the caller's handler afterwards; resetting to SIG_DFL lets a later
++  // write to the closed MTP pipe kill the recovery.
++  auto old_sigpipe = signal(SIGPIPE, SIG_IGN);
+ 
+   android::base::unique_fd recovery_socket;
+   android::base::unique_fd minadbd_socket;
+@@ -332,7 +334,7 @@ static void CreateMinadbdServiceAndExecuteCommands(
+     }
+   }
+ 
+-  signal(SIGPIPE, SIG_DFL);
++  signal(SIGPIPE, old_sigpipe);
+ }
+ 
+   int twrp_sideload(const char* install_file, Device::BuiltinAction* reboot_action) {
