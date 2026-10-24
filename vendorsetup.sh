@@ -24,7 +24,7 @@ export TARGET_ARCH="arm64"
 # About Us
 unset FOX_VERSION
 export FOX_MAINTAINER_PATCH_VERSION="1"
-export OF_MAINTAINER="Gigaachad"
+export OF_MAINTAINER="Farpathan"
 export FOX_BUILD_TYPE="Unofficial"
 
 # Build Environment Stuff
