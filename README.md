@@ -1,26 +1,39 @@
-# Android Device Tree for Nothing Phone (3) - Metroid
+# OrangeFox Recovery for the Nothing Phone (3) (`Metroid`)
 
-OrangeFox Recovery device tree for Nothing Phone (3) (codename: Metroid, model: A024)
+OrangeFox R12.0_1 device tree for the Nothing Phone (3), codename `Metroid`, model `A024`. Prebuilt images are on the [Releases](https://github.com/Farpathan/android_device_nothing_metroid/releases) page, tagged `ofox-v*`.
 
-## Device Specifications
+## Building
 
-| Feature  | Specification                  |
-| -------- | ------------------------------ |
-| Chipset  | Qualcomm Snapdragon SM8735 (8s Gen 4 / tuna) |
-| Platform | sun                            |
-| CPU      | Octa-core                      |
-| GPU      | Adreno                         |
-| Memory   | 8/12/16 GB                     |
-| Storage  | 256/512 GB                     |
-| Display  | 6.7" 1260 x 2800 pixels, 120Hz (1.5K AMOLED) |
+The tree builds on the TWRP 12.1 minimal manifest with OrangeFox's `fox_12.1` recovery sources in place of TWRP's.
 
-## Current Status
+```bash
+repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1
+repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
 
-| Feature        | Status               |
-| -------------- | -------------------- |
-| Boot           | ✅ Working           |
-| Touch          | ✅ Working |
-| ADB            | ✅ Working           |         
-| Sideload       | ✅ Working           |
-| Backup/Restore | ✅ Working           |    
-| Encryption     | ✅ Working           |
+rm -rf bootable/recovery
+git clone https://gitlab.com/OrangeFox/bootable/Recovery.git -b fox_12.1 bootable/recovery
+git clone https://gitlab.com/OrangeFox/vendor/recovery.git -b main vendor/recovery
+git clone https://github.com/Farpathan/android_device_nothing_metroid.git -b fox_12.1 device/nothing/Metroid
+
+. build/envsetup.sh
+lunch twrp_Metroid-eng
+mka recoveryimage -j$(nproc --all)
+```
+
+`vendorsetup.sh` sets the OrangeFox build variables and applies the patches in `patches/`. The image and flashable zip end up in `out/target/product/Metroid/`.
+
+## Flashing
+
+```bash
+adb reboot bootloader
+fastboot flash recovery_a OrangeFox-R12.0_1-Unofficial-Metroid.img
+fastboot flash recovery_b OrangeFox-R12.0_1-Unofficial-Metroid.img
+fastboot reboot recovery
+```
+
+Flash both slots. The bootloader boots the recovery of the active slot, and the active slot changes after an OTA or a ROM flash. From a custom recovery you can also install `OrangeFox-R12.0_1-Unofficial-Metroid.zip`.
+
+## Credits
+
+- [OrangeFox Recovery Project](https://gitlab.com/OrangeFox)
+- [TeamWin Recovery Project](https://github.com/TeamWin)
