@@ -1,3 +1,101 @@
+diff --git a/fastboot/device/commands.cpp b/fastboot/device/commands.cpp
+index 980f20a..93297f7 100644
+--- a/fastboot/device/commands.cpp
++++ b/fastboot/device/commands.cpp
+@@ -16,6 +16,7 @@
+ 
+ #include "commands.h"
+ 
++#include <dlfcn.h>
+ #include <inttypes.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+@@ -286,6 +287,67 @@ bool DownloadHandler(FastbootDevice* device, const std::vector<std::string>& arg
+     return device->WriteStatus(FastbootResult::FAIL, "Couldn't download data");
+ }
+ 
++// The stock firmware only ships the AIDL boot HAL. libbinder_ndk has no recovery
++// variant to link against here, so use its stable C API from the copy in recovery.
++static bool SetActiveBootSlotAidl(Slot slot, std::string* error) {
++    static constexpr uint32_t kSetActiveBootSlot = 1 /* FIRST_CALL_TRANSACTION */ + 8;
++    void* ndk = dlopen("libbinder_ndk.so", RTLD_NOW);
++    if (!ndk) {
++        *error = std::string("Unable to load libbinder_ndk: ") + dlerror();
++        return false;
++    }
++    auto checkService = reinterpret_cast<void* (*)(const char*)>(
++            dlsym(ndk, "AServiceManager_checkService"));
++    auto defineClass = reinterpret_cast<void* (*)(const char*, void* (*)(void*), void (*)(void*),
++                                                   int32_t (*)(void*, uint32_t, const void*, void*))>(
++            dlsym(ndk, "AIBinder_Class_define"));
++    auto associateClass =
++            reinterpret_cast<bool (*)(void*, const void*)>(dlsym(ndk, "AIBinder_associateClass"));
++    auto prepare = reinterpret_cast<int32_t (*)(void*, void**)>(
++            dlsym(ndk, "AIBinder_prepareTransaction"));
++    auto writeInt32 = reinterpret_cast<int32_t (*)(void*, int32_t)>(dlsym(ndk, "AParcel_writeInt32"));
++    auto transact = reinterpret_cast<int32_t (*)(void*, uint32_t, void**, void**, uint32_t)>(
++            dlsym(ndk, "AIBinder_transact"));
++    auto readStatus = reinterpret_cast<int32_t (*)(const void*, void**)>(
++            dlsym(ndk, "AParcel_readStatusHeader"));
++    auto statusOk = reinterpret_cast<bool (*)(const void*)>(dlsym(ndk, "AStatus_isOk"));
++    auto statusDelete = reinterpret_cast<void (*)(void*)>(dlsym(ndk, "AStatus_delete"));
++    auto parcelDelete = reinterpret_cast<void (*)(void*)>(dlsym(ndk, "AParcel_delete"));
++    auto decStrong = reinterpret_cast<void (*)(void*)>(dlsym(ndk, "AIBinder_decStrong"));
++    if (!checkService || !defineClass || !associateClass || !prepare || !writeInt32 ||
++        !transact || !readStatus || !statusOk || !statusDelete || !parcelDelete || !decStrong) {
++        *error = "libbinder_ndk is missing symbols";
++        return false;
++    }
++
++    void* binder = checkService("android.hardware.boot.IBootControl/default");
++    if (!binder) {
++        *error = "AIDL boot control HAL not registered";
++        return false;
++    }
++    static void* clazz = defineClass(
++            "android.hardware.boot.IBootControl", [](void* args) { return args; },
++            [](void*) {}, [](void*, uint32_t, const void*, void*) -> int32_t { return -1; });
++    void* in = nullptr;
++    void* out = nullptr;
++    int32_t rc = 0;
++    if (!associateClass(binder, clazz)) {
++        *error = "AIDL boot control HAL has an unexpected descriptor";
++    } else if ((rc = prepare(binder, &in)) != 0 || (rc = writeInt32(in, slot)) != 0 ||
++               (rc = transact(binder, kSetActiveBootSlot, &in, &out, 0)) != 0) {
++        *error = "AIDL setActiveBootSlot transaction failed: " + std::to_string(rc);
++    } else {
++        void* status = nullptr;
++        if (readStatus(out, &status) != 0 || !statusOk(status)) {
++            *error = "AIDL setActiveBootSlot returned an error";
++        }
++        if (status) statusDelete(status);
++    }
++    if (out) parcelDelete(out);
++    decStrong(binder);
++    return error->empty();
++}
++
+ bool SetActiveHandler(FastbootDevice* device, const std::vector<std::string>& args) {
+     if (args.size() < 2) {
+         return device->WriteStatus(FastbootResult::FAIL, "Missing slot argument");
+@@ -305,8 +367,15 @@ bool SetActiveHandler(FastbootDevice* device, const std::vector<std::string>& ar
+     // Non-A/B devices will not have a boot control HAL.
+     auto boot_control_hal = device->boot_control_hal();
+     if (!boot_control_hal) {
+-        return device->WriteStatus(FastbootResult::FAIL,
+-                                   "Cannot set slot: boot control HAL absent");
++        if (slot >= 2) {
++            return device->WriteStatus(FastbootResult::FAIL, "Slot out of range");
++        }
++        std::string error;
++        if (!SetActiveBootSlotAidl(slot, &error)) {
++            return device->WriteStatus(FastbootResult::FAIL, "Cannot set slot: " + error);
++        }
++        device->set_active_slot("_" + args[1]);
++        return device->WriteStatus(FastbootResult::OKAY, "");
+     }
+     if (slot >= boot_control_hal->getNumberSlots()) {
+         return device->WriteStatus(FastbootResult::FAIL, "Slot out of range");
 diff --git a/fastboot/device/fastboot_device.cpp b/fastboot/device/fastboot_device.cpp
 index 64a934d..ef052cb 100644
 --- a/fastboot/device/fastboot_device.cpp
@@ -166,6 +264,19 @@ index 3f9b0f0..f2b1ac4 100644
              goto err;
          }
          // Signal only when writing the descriptors to ffs
+diff --git a/fastboot/device/utility.cpp b/fastboot/device/utility.cpp
+index cc0f0aa..6797eeb 100644
+--- a/fastboot/device/utility.cpp
++++ b/fastboot/device/utility.cpp
+@@ -213,6 +213,8 @@ bool UpdateAllPartitionMetadata(FastbootDevice* device, const std::string& super
+     auto boot_control_hal = device->boot_control_hal();
+     if (boot_control_hal) {
+         num_slots = boot_control_hal->getNumberSlots();
++    } else if (!android::base::GetProperty("ro.boot.slot_suffix", "").empty()) {
++        num_slots = 2;
+     }
+ 
+     bool ok = true;
 diff --git a/fastboot/device/variables.cpp b/fastboot/device/variables.cpp
 index dd9d049..fe7d4ab 100644
 --- a/fastboot/device/variables.cpp

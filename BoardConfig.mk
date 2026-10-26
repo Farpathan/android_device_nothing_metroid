@@ -43,3 +43,8 @@ TARGET_RECOVERY_DEVICE_MODULES += libexpat
 RECOVERY_LIBRARY_SOURCE_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libexpat.so
 
 TW_NO_LEGACY_BOOT_HAL := true
+# Normally pulled in by the legacy boot HAL modules
+TARGET_RECOVERY_DEVICE_MODULES += libhardware android.hardware.boot@1.2
+RECOVERY_LIBRARY_SOURCE_FILES += \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libhardware.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/android.hardware.boot@1.2.so
