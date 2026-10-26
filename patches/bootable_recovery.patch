@@ -312,34 +312,88 @@ index 84a027d..e615808 100755
  		if (Is_Mounted()) {
  			if (Display_Error)
 diff --git a/partitionmanager.cpp b/partitionmanager.cpp
-index a311808..e35e572 100755
+index a311808..57f6599 100755
 --- a/partitionmanager.cpp
 +++ b/partitionmanager.cpp
-@@ -593,6 +593,23 @@ void TWPartitionManager::Decrypt_Data() {
+@@ -584,6 +584,57 @@ int TWPartitionManager::Write_Fstab(void) {
+ 	return true;
+ }
+ 
++// KeyMint binds keys to the OS version and patch levels it starts with, so they must match the installed ROM
++static bool Sync_KeyMint_Props() {
++	bool changed = false;
++	auto sync = [&changed](const std::string& prop, const std::string& value) {
++		if (value.empty() || android::base::GetProperty(prop, "") == value)
++			return;
++		LOGINFO("Setting %s to '%s' from the installed ROM\n", prop.c_str(), value.c_str());
++		TWFunc::Property_Override(prop, value);
++		changed = true;
++	};
++	sync("ro.build.version.release", TWFunc::System_Property_Get("ro.build.version.release"));
++	sync("ro.build.version.security_patch", TWFunc::System_Property_Get("ro.build.version.security_patch"));
++	sync("ro.vendor.build.security_patch",
++		TWFunc::Partition_Property_Get("ro.vendor.build.security_patch", PartitionManager, "/vendor", "build.prop"));
++	sync("ro.vendor.boot_security_patch",
++		TWFunc::Partition_Property_Get("ro.vendor.boot_security_patch", PartitionManager, "/vendor", "build.prop"));
++	return changed;
++}
++
++// KeyMint and Gatekeeper run from /vendor and TWPartition::UnMount stops them to release it
++static void Start_Crypto_Services() {
++	for (const char* path : {"/vendor", "/odm"}) {
++		TWPartition* part = PartitionManager.Find_Partition_By_Path(path);
++		if (part != nullptr && !part->Is_Mounted())
++			part->Mount(false);
++	}
++	if (Sync_KeyMint_Props() && android::base::GetProperty("init.svc.vendor.keymint-qti", "") == "running") {
++		property_set("ctl.stop", "vendor.keymint-qti");
++		android::base::WaitForProperty("init.svc.vendor.keymint-qti", "stopped", std::chrono::seconds(3));
++	}
++	bool restarted = false;
++	for (const char* svc : {"qseecomd", "vendor.gatekeeper_default", "vendor.keymint-qti"}) {
++		std::string prop = std::string("init.svc.") + svc;
++		if (android::base::GetProperty(prop, "") == "running")
++			continue;
++		LOGINFO("Starting %s\n", svc);
++		property_set("ctl.start", svc);
++		android::base::WaitForProperty(prop, "running", std::chrono::seconds(3));
++		restarted = true;
++	}
++	// keystore2 keeps a binder to the KeyMint instance it first connected to
++	if (restarted) {
++		LOGINFO("Restarting keystore2\n");
++		property_set("ctl.restart", "keystore2");
++	} else if (android::base::GetProperty("init.svc.keystore2", "") != "running") {
++		property_set("ctl.start", "keystore2");
++	}
++	android::base::WaitForProperty("init.svc.keystore2", "running", std::chrono::seconds(3));
++	usleep(200000);
++}
++
+ void TWPartitionManager::Decrypt_Data() {
+ #ifdef TW_INCLUDE_CRYPTO
+ 	TWPartition* Decrypt_Data = Find_Partition_By_Path("/data");
+@@ -593,6 +644,11 @@ void TWPartitionManager::Decrypt_Data() {
  		if (Key_Directory_Partition != nullptr)
  			if (!Key_Directory_Partition->Is_Mounted())
  				Mount_By_Path(Decrypt_Data->Key_Directory, false);
 +
-+		// Ensure vendor and odm partitions are mounted for KeyMint and Gatekeeper HALs
-+		TWPartition* Ven_Partition = Find_Partition_By_Path("/vendor");
-+		if (Ven_Partition != nullptr && !Ven_Partition->Is_Mounted())
-+			Ven_Partition->Mount(false);
-+		TWPartition* Odm_Partition = Find_Partition_By_Path("/odm");
-+		if (Odm_Partition != nullptr && !Odm_Partition->Is_Mounted())
-+			Odm_Partition->Mount(false);
-+
-+		property_set("orangefox.mount_to_decrypt", "1");
++		property_set("twrp.mount_to_decrypt", "1");
 +		property_set("ctl.restart", "servicemanager");
-+		property_set("ctl.start", "qseecomd");
-+		property_set("ctl.start", "vendor.gatekeeper_default");
-+		property_set("ctl.start", "vendor.keymint-qti");
-+		property_set("ctl.start", "keystore2");
-+		usleep(200000);
++		Start_Crypto_Services();
 +
  		if (!Decrypt_Data->Key_Directory.empty()) {
  			Set_Crypto_Type("file");
  #ifdef TW_INCLUDE_FBE_METADATA_DECRYPT
-@@ -4412,6 +4429,29 @@ bool TWPartitionManager::Check_Pending_Merges() {
+@@ -2226,6 +2282,7 @@ int TWPartitionManager::Decrypt_Device(string Password, int user_id) {
+ 		}
+ 	}
+ 	property_set("twrp.mount_to_decrypt", "1");
++	Start_Crypto_Services();
+ 
+ 	Set_Crypto_State();
+ 	Set_Crypto_Type("block");
+@@ -4412,6 +4469,29 @@ bool TWPartitionManager::Check_Pending_Merges() {
  		return false;
  	}
  

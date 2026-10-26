@@ -86,6 +86,20 @@ on boot
     wait /sys/class/power_supply/battery/capacity 5
     start health-hal-2-1
 
+# Stock AIDL boot HAL, with its own Android 15 libraries
+service vendor.boot-qti /system/bin/hw/android.hardware.boot-service.qti.recovery
+    user root
+    group root
+    disabled
+    setenv LD_LIBRARY_PATH /system/lib64/bootctl
+    seclabel u:r:recovery:s0
+
+# servicemanager has no onrestart hooks in recovery, so re-register after every restart.
+# The Android 15 libbinder also waits for servicemanager.ready, which this servicemanager never sets.
+on property:init.svc.servicemanager=running
+    setprop servicemanager.ready true
+    restart vendor.boot-qti
+
 service qseecomd /vendor/bin/qseecomd
     class core
     user root

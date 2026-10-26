@@ -12,7 +12,7 @@ index 755f0e3..476e457 100644
  
      // Make sure we only return true during boot. See b/138952436 for discussion
 diff --git a/Decrypt.cpp b/Decrypt.cpp
-index d9f034b..78f72d2 100755
+index d9f034b..2543dc4 100755
 --- a/Decrypt.cpp
 +++ b/Decrypt.cpp
 @@ -26,6 +26,7 @@
@@ -23,7 +23,29 @@ index d9f034b..78f72d2 100755
  
  #include <keyutils.h>
  #include "Weaver1.h"
-@@ -521,7 +522,7 @@ namespace keystore {
+@@ -59,6 +60,7 @@
+ 
+ #include <binder/IServiceManager.h>
+ #include <binder/IPCThreadState.h>
++#include <binder/Status.h>
+ #include <hardware/hw_auth_token.h>
+ 
+ #include <gatekeeper/GateKeeperResponse.h>
+@@ -502,8 +504,12 @@ namespace keystore {
+ 				.Authorization(::keymint::TAG_MAC_LENGTH, maclen);
+ 
+ 			ks2::KeyEntryResponse keyEntryResponse;
+-			::ndk::SpAIBinder keystoreBinder(AServiceManager_checkService("android.system.keystore2.IKeystoreService/default"));
++			::ndk::SpAIBinder keystoreBinder(AServiceManager_getService("android.system.keystore2.IKeystoreService/default"));
+ 			auto keystore = ks2::IKeystoreService::fromBinder(keystoreBinder);
++			if (!keystore) {
++				printf("keystore2 service not available\n");
++				return disk_decryption_secret_key;
++			}
+ 			auto rc = keystore->getKeyEntry(keyDescriptor(keystore_alias), &keyEntryResponse);
+ 			if (!rc.isOk()) {
+ 				auto error = unwrapError(rc);
+@@ -521,7 +527,7 @@ namespace keystore {
  				keyResponse.metadata.key, begin_params.vector_data(), true,
  				&encOperationResponse);
  			if (!begin_rc.isOk()) {
@@ -32,7 +54,7 @@ index d9f034b..78f72d2 100755
  				return disk_decryption_secret_key;
  			}
  			std::optional<std::vector<uint8_t>> optPlaintext;
-@@ -749,62 +750,150 @@ bool Decrypt_User_Synth_Pass(const userid_t user_id, const std::string& Password
+@@ -749,62 +755,160 @@ bool Decrypt_User_Synth_Pass(const userid_t user_id, const std::string& Password
  		memcpy((void*)&application_id[0], (void*)&password_token[0], PASSWORD_TOKEN_SIZE);
  		memcpy((void*)&application_id[PASSWORD_TOKEN_SIZE], secdiscardable, SHA512_DIGEST_LENGTH);
  		if (Password != "!") {
@@ -91,7 +113,13 @@ index d9f034b..78f72d2 100755
 +
 +			// Check for AIDL Gatekeeper HAL first (Android 14+)
 +			android::sp<android::IServiceManager> sm = android::defaultServiceManager();
-+			android::sp<android::IBinder> gk_binder = sm->checkService(android::String16("android.hardware.gatekeeper.IGatekeeper/default"));
++			android::sp<android::IBinder> gk_binder;
++			// Recovery may have just restarted the Gatekeeper daemon, give it time to register
++			for (int i = 0; i < 50 && gk_binder == nullptr; i++) {
++				gk_binder = sm->checkService(android::String16("android.hardware.gatekeeper.IGatekeeper/default"));
++				if (gk_binder == nullptr)
++					usleep(100000);
++			}
 +			if (gk_binder != nullptr) {
 +				printf("Found AIDL Gatekeeper service android.hardware.gatekeeper.IGatekeeper/default\n");
 +				android::Parcel data, reply;
@@ -110,7 +138,11 @@ index d9f034b..78f72d2 100755
 +				} else {
 +					int32_t exceptionCode = reply.readExceptionCode();
 +					if (exceptionCode != 0) {
-+						printf("AIDL Gatekeeper exception code: %d\n", exceptionCode);
++						android::binder::Status gkStatus;
++						reply.setDataPosition(0);
++						gkStatus.readFromParcel(reply);
++						printf("AIDL Gatekeeper exception code: %d, service error: %d (%s)\n", exceptionCode,
++							gkStatus.serviceSpecificErrorCode(), gkStatus.exceptionMessage().c_str());
 +					} else {
 +						int32_t resp_null = reply.readInt32();
 +						if (resp_null != 0) {
@@ -172,7 +204,7 @@ index d9f034b..78f72d2 100755
 +			} else {
 +				printf("AIDL Gatekeeper not found, checking HIDL Gatekeeper\n");
 +				android::sp<android::hardware::gatekeeper::V1_0::IGatekeeper> gk_device;
-+				gk_device = ::android::hardware::gatekeeper::V1_0::IGatekeeper::getService();
++				gk_device = ::android::hardware::gatekeeper::V1_0::IGatekeeper::tryGetService();
 +				if (gk_device != nullptr) {
 +					android::hardware::hidl_vec<uint8_t> pwd_handle_hidl;
 +					pwd_handle_hidl.setToExternal(const_cast<uint8_t *>((const uint8_t *)pwd.password_handle), pwd.handle_len);
@@ -227,6 +259,15 @@ index d9f034b..78f72d2 100755
  				return Free_Return(retval, weaver_key, &pwd);
  			}
  		}
+@@ -922,7 +1026,7 @@ extern "C" bool Decrypt_User(const userid_t user_id, const std::string& Password
+     bool should_reenroll;
+ 	bool request_reenroll = false;
+ 	android::sp<android::hardware::gatekeeper::V1_0::IGatekeeper> gk_device;
+-	gk_device = ::android::hardware::gatekeeper::V1_0::IGatekeeper::getService();
++	gk_device = ::android::hardware::gatekeeper::V1_0::IGatekeeper::tryGetService();
+ 	if (gk_device == nullptr)
+ 		return false;
+ 	android::hardware::hidl_vec<uint8_t> curPwdHandle;
 diff --git a/FsCrypt.cpp b/FsCrypt.cpp
 index 7505e56..7918559 100644
 --- a/FsCrypt.cpp

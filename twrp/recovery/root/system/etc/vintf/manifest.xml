@@ -123,6 +123,13 @@
         <fqname>@1.0::ISystemEvent/default</fqname>
         <fqname>@1.0::ISystemResource/default</fqname>
     </hal>
+    <hal format="aidl">
+        <name>android.hardware.boot</name>
+        <interface>
+            <name>IBootControl</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
     <system-sdk>
         <version>28</version>
         <version>29</version>
