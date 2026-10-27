@@ -248,7 +248,7 @@ index 132e89e8..52f116b1 100644
  				TWFunc::Exec_Cmd("umount -l " + Mount_Point);
  				sleep(1);
 diff --git a/partitionmanager.cpp b/partitionmanager.cpp
-index b52a7d49..eb130d76 100755
+index b52a7d49..3a53a997 100755
 --- a/partitionmanager.cpp
 +++ b/partitionmanager.cpp
 @@ -669,6 +669,55 @@ int TWPartitionManager::Write_Fstab(void) {
@@ -327,7 +327,38 @@ index b52a7d49..eb130d76 100755
    Set_Crypto_State();
    Set_Crypto_Type("block");
  
-@@ -4866,6 +4921,29 @@ bool TWPartitionManager::Check_Pending_Merges() {
+@@ -4851,6 +4906,30 @@ bool TWPartitionManager::Unmap_Super_Devices() {
+ 			++iter;
+ 		}
+ 	}
++
++	// The other slot's partitions can be mapped too, and fastbootd cannot remap them while they are
++	std::vector<std::string> leftover;
++	DIR* d = opendir("/dev/block/mapper");
++	if (d != NULL) {
++		struct dirent* de;
++		while ((de = readdir(d)) != NULL) {
++			std::string name = de->d_name;
++			if (de->d_type == DT_DIR || name == "control")
++				continue;
++			for (const char* suffix : {"_a", "_b", "_a-cow", "_b-cow"}) {
++				if (android::base::EndsWith(name, suffix)) {
++					leftover.push_back(name);
++					break;
++				}
++			}
++		}
++		closedir(d);
++	}
++	for (const auto& name : leftover) {
++		LOGINFO("removing dynamic partition: %s\n", name.c_str());
++		if (!DestroyLogicalPartition(name))
++			LOGINFO("Unable to remove %s\n", name.c_str());
++	}
+ 	return true;
+ }
+ 
+@@ -4866,6 +4945,29 @@ bool TWPartitionManager::Check_Pending_Merges() {
  		return false;
  	}
  
